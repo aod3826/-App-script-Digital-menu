@@ -581,182 +581,7 @@
     <!-- MAIN CORE APPLICATION ENGINE (JAVASCRIPT) -->
     <script>
         // ==========================================
-        // 1. DATA INITIALIZATION & LOCAL DATABASE (SIMULATOR ENGINE)
-        // ==========================================
-        // เมนูเริ่มต้นและหมวดหมู่จริงตามใบเมนูของส้มตำเอเอ้สะกะดุ้งกะดิ้ง
-        const MOCK_CATEGORIES = [
-            { id: "CAT001", name: "ทั้งหมด", createdAt: "2026-06-04 09:00:00", updatedAt: "2026-06-04 09:00:00" },
-            { id: "CAT002", name: "ส้มตำ", createdAt: "2026-06-04 09:01:00", updatedAt: "2026-06-04 09:01:00" },
-            { id: "CAT003", name: "ย่าง/ลาบ", createdAt: "2026-06-04 09:02:00", updatedAt: "2026-06-04 09:02:00" },
-            { id: "CAT004", name: "เครื่องเคียง", createdAt: "2026-06-04 09:03:00", updatedAt: "2026-06-04 09:03:00" }
-        ];
-
-        const MOCK_MENUS = [
-            {
-                id: "MN00001",
-                name: "ตำไทย",
-                price: 40,
-                description: "ส้มตำไทยมะละกอกรอบ ปรุงรสหวานอมเปรี้ยวกลมกล่อม โรยด้วยกุ้งแห้งและถั่วลิสงคั่วใหม่หอมกรุ่น",
-                imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=600",
-                category: "ส้มตำ",
-                status: "Active",
-                createdAt: "2026-06-04 10:00:00",
-                updatedAt: "2026-06-04 10:00:00"
-            },
-            {
-                id: "MN00002",
-                name: "ตำไทย/ไข่เค็ม",
-                price: 50,
-                description: "ตำไทยรสจัดจ้านที่ผสมผสานความมันนัวของไข่เค็มคัดพิเศษ เหมาะสำหรับผู้ที่ชื่นชอบความกลมกล่อม",
-                imageUrl: "https://images.unsplash.com/photo-1559847844-5315be91338e?auto=format&fit=crop&q=80&w=600",
-                category: "ส้มตำ",
-                status: "Active",
-                createdAt: "2026-06-04 10:05:00",
-                updatedAt: "2026-06-04 10:05:00"
-            },
-            {
-                id: "MN00003",
-                name: "ตำปูปลาร้า",
-                price: 40,
-                description: "ตำปูปลาร้าสูตรเข้มข้น น้ำปลาร้าต้มสุกปรุงรสหอมนัว แซ่บสะกุ้งกะดิ้งตามแบบฉบับดั้งเดิม",
-                imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=600",
-                category: "ส้มตำ",
-                status: "Active",
-                createdAt: "2026-06-04 10:10:00",
-                updatedAt: "2026-06-04 10:10:00"
-            },
-            {
-                id: "MN00004",
-                name: "ตำข้าวโพด/ไข่เค็ม",
-                price: 50,
-                description: "ข้าวโพดหวานสีเหลืองทอง คลุกเคล้าน้ำตำรสหวานอมเปรี้ยวและไข่เค็มมันนัว ทานง่ายสดชื่นสุดๆ",
-                imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600",
-                category: "ส้มตำ",
-                status: "Active",
-                createdAt: "2026-06-04 10:15:00",
-                updatedAt: "2026-06-04 10:15:00"
-            },
-            {
-                id: "MN00005",
-                name: "ตำเส้นเล็ก/หมูยอ",
-                price: 55,
-                description: "เส้นเล็กลวกเหนียวนุ่มคลุกน้ำตำส้มตำนัวๆ ทานคู่กับหมูยอพรีเมียมหอมกลิ่นพริกไทยดำแป้งน้อยเนื้อเน้น",
-                imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=600",
-                category: "ส้มตำ",
-                status: "Active",
-                createdAt: "2026-06-04 10:20:00",
-                updatedAt: "2026-06-04 10:20:00"
-            },
-            {
-                id: "MN00006",
-                name: "กุ้งสด/แคปหมู",
-                price: 60,
-                description: "ส้มตำสุดพรีเมียมเสิร์ฟพร้อมกุ้งสดเนื้อหวานเด้งคลุกเคล้าน้ำตำนัวๆ โรยหน้าด้วยแคปหมูกรอบไร้มัน",
-                imageUrl: "https://images.unsplash.com/photo-1559847844-5315be91338e?auto=format&fit=crop&q=80&w=600",
-                category: "ส้มตำ",
-                status: "Active",
-                createdAt: "2026-06-04 10:25:00",
-                updatedAt: "2026-06-04 10:25:00"
-            },
-            {
-                id: "MN00007",
-                name: "คอหมูย่าง",
-                price: 60,
-                description: "คอหมูหมักสมุนไพรย่างเตาถ่านจนหนังเกรียมสวยหอมกรุ่น เนื้อนุ่มชุ่มฉ่ำละลายในปาก เสิร์ฟพร้อมน้ำจิ้มแจ่วสุดแซ่บ",
-                imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600",
-                category: "ย่าง/ลาบ",
-                status: "Active",
-                createdAt: "2026-06-04 10:30:00",
-                updatedAt: "2026-06-04 10:30:00"
-            },
-            {
-                id: "MN00008",
-                name: "ลาบ / น้ำตก",
-                price: 60,
-                description: "ลาบเนื้อหมูสับละเอียดปรุงรสจัดจ้าน นัวน้ำปลาร้าและข้าวคั่วใหม่ หอมสมุนไพรสะระแหน่และต้นหอมคั้นสด",
-                imageUrl: "https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?auto=format&fit=crop&q=80&w=600",
-                category: "ย่าง/ลาบ",
-                status: "Active",
-                createdAt: "2026-06-04 10:35:00",
-                updatedAt: "2026-06-04 10:35:00"
-            },
-            {
-                id: "MN00009",
-                name: "ไก่ย่าง",
-                price: 5,
-                description: "ไก่เสียบไม้ย่างสูตรโบราณหอมขมิ้นและเครื่องเทศเข้มข้น ย่างแห้งกำลังดีราคาสุดพิเศษเพียง 5 บาทเท่านั้น",
-                imageUrl: "https://images.unsplash.com/photo-1598515214211-89d3e73ae83b?auto=format&fit=crop&q=80&w=600",
-                category: "ย่าง/ลาบ",
-                status: "Active",
-                createdAt: "2026-06-04 10:40:00",
-                updatedAt: "2026-06-04 10:40:00"
-            },
-            {
-                id: "MN00010",
-                name: "ข้าวเหนียว",
-                price: 5,
-                description: "ข้าวเหนียวเขี้ยวนู้นึ่งร้อนๆ นุ่มเหนียวจับใจ เสิร์ฟใส่กระติ๊บทานคู่ส้มตำแซ่บๆ เข้ากันอย่างดีที่สุด",
-                imageUrl: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=600",
-                category: "เครื่องเคียง",
-                status: "Active",
-                createdAt: "2026-06-04 10:45:00",
-                updatedAt: "2026-06-04 10:45:00"
-            }
-        ];
-
-        const MOCK_LOGS = [
-            { timestamp: "2026-06-04 10:45:00", action: "เพิ่มเมนู", menuId: "MN00010", menuName: "ข้าวเหนียว", user: "Admin (127.0.0.1)", details: "อัปโหลดข้อมูลข้าวเหนียว ราคา 5 บาท เข้าสู่ฐานระบบสำเร็จ" },
-            { timestamp: "2026-06-04 10:40:00", action: "เพิ่มเมนู", menuId: "MN00009", menuName: "ไก่ย่าง", user: "Admin (127.0.0.1)", details: "สร้างเมนูไก่ย่างสูตรขมิ้นโบราณ ราคาประหยัด 5 บาท" },
-            { timestamp: "2026-06-04 10:30:00", action: "เพิ่มเมนู", menuId: "MN00007", menuName: "คอหมูย่าง", user: "Admin (127.0.0.1)", details: "สร้างเมนูคอหมูย่างพรีเมียมราคา 60 บาทพร้อมพรีวิวรูปภาพเรียบร้อย" }
-        ];
-
-        // กำหนด Database สำรองถ้าระบบไม่เชื่อม API
-        const dbEngine = {
-            init: function() {
-                if (!localStorage.getItem("minimaliste_menus")) {
-                    localStorage.setItem("minimaliste_menus", JSON.stringify(MOCK_MENUS));
-                }
-                if (!localStorage.getItem("minimaliste_categories")) {
-                    localStorage.setItem("minimaliste_categories", JSON.stringify(MOCK_CATEGORIES));
-                }
-                if (!localStorage.getItem("minimaliste_logs")) {
-                    localStorage.setItem("minimaliste_logs", JSON.stringify(MOCK_LOGS));
-                }
-            },
-            getMenus: function() {
-                return JSON.parse(localStorage.getItem("minimaliste_menus"));
-            },
-            saveMenus: function(menus) {
-                localStorage.setItem("minimaliste_menus", JSON.stringify(menus));
-            },
-            getCategories: function() {
-                return JSON.parse(localStorage.getItem("minimaliste_categories"));
-            },
-            saveCategories: function(categories) {
-                localStorage.setItem("minimaliste_categories", JSON.stringify(categories));
-            },
-            getLogs: function() {
-                return JSON.parse(localStorage.getItem("minimaliste_logs"));
-            },
-            addLog: function(action, menuId, menuName, details) {
-                const logs = JSON.parse(localStorage.getItem("minimaliste_logs")) || [];
-                const newLog = {
-                    timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-                    action: action,
-                    menuId: menuId || "-",
-                    menuName: menuName || "-",
-                    user: "Admin (Localhost)",
-                    details: details
-                };
-                logs.unshift(newLog);
-                localStorage.setItem("minimaliste_logs", JSON.stringify(logs.slice(0, 50)));
-            }
-        };
-
-        dbEngine.init();
-
-        // ==========================================
-        // 2. CORE STATE & VARIABLES
+        // 1. DATA INITIALIZATION & CORE STATE
         // ==========================================
         let state = {
             menus: [],
@@ -770,11 +595,11 @@
             activeSkeleton: true,
             activeFormImageBase64: null,
             activeFormImageName: null,
-            useLocalFallback: false // ตั้งค่าสถานะจำลอง (True = ทำงานใน Local Storage ทันทีเมื่อ API ถูกสกัดกั้น)
+            useLocalFallback: false // ปิดการบังคับโหมดจำลองเพื่อให้ทำงานร่วมกับ API โดยตรง
         };
 
         // ==========================================
-        // 3. UTILITIES & API COMMUNICATION (WITH AUTO BACKOFF)
+        // 2. UTILITIES & API COMMUNICATION (LIVE-ONLY ENGINE)
         // ==========================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -812,43 +637,24 @@
             }, 4000);
         }
 
-        // จัดการแสดงผลปุ่มระบุสถานะ Connection
+        // จัดการแสดงผลปุ่มระบุสถานะ Connection คลาวด์
         function renderConnectionStatus() {
             const container = document.getElementById("status-pill-container");
             if (!container) return;
 
-            if (state.useLocalFallback) {
-                container.innerHTML = `
-                    <button onclick="toggleConnectionMode(false)" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium hover:bg-amber-100 transition-all shadow-sm" title="คลิกเพื่อสลับกลับไปเชื่อมต่อคลาวด์">
-                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span>โหมดจำลอง (Local)</span>
-                    </button>
-                `;
-            } else {
-                container.innerHTML = `
-                    <button onclick="toggleConnectionMode(true)" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium hover:bg-emerald-100 transition-all shadow-sm" title="คลิกเพื่อสลับไปใช้ระบบจำลองทดสอบ">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span>โหมดคลาวด์ (Live)</span>
-                    </button>
-                `;
-            }
+            container.innerHTML = `
+                <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>ระบบคลาวด์ชีตออนไลน์ (Live)</span>
+                </div>
+            `;
         }
 
-        function toggleConnectionMode(forceLocal) {
-            state.useLocalFallback = forceLocal;
-            renderConnectionStatus();
-            if (forceLocal) {
-                showToast("สลับการทำงานมายังโหมดจำลองในอุปกรณ์สำเร็จ", "success");
-            } else {
-                showToast("กำลังพยายามเชื่อมต่อฐานข้อมูลคลาวด์อีกครั้ง...", "success");
-            }
-            loadData();
-        }
-
-        // เรียก API ไปยัง Google Apps Script พร้อมระบบ Exponential Backoff สูงสุด 5 ครั้ง
+        // เรียก API ไปยัง Google Apps Script เท่านั้น (นำกลไกจำลอง Local ออกทั้งหมด)
         async function fetchAPI(payload, retryCount = 0) {
-            if (state.useLocalFallback || !CONFIG.gasUrl) {
-                return simulateLocalAPI(payload);
+            if (!CONFIG.gasUrl) {
+                showToast("กรุณาระบุ CONFIG.gasUrl เพื่อใช้ทำงานกับฐานข้อมูลคลาวด์จริง", "error");
+                throw new Error("Missing gasUrl configuration");
             }
 
             try {
@@ -862,157 +668,39 @@
                 const data = await response.json();
                 return data;
             } catch (error) {
-                // หากเฟตช์แรกล้มเหลวแบบทันที (เช่น ถูกบล็อก CORS หรือไม่มีเน็ต) สลับเข้าโหมดจำลองทันทีแทนการวนซ้ำนาน
-                if (retryCount === 0 && (error.name === "TypeError" || error.message.includes("fetch"))) {
-                    console.warn("Detected direct fetch restriction. Auto switching to Local Simulated Database Mode.");
-                    state.useLocalFallback = true;
-                    renderConnectionStatus();
-                    return simulateLocalAPI(payload);
-                }
-
                 if (retryCount < 5) {
                     const delay = Math.pow(2, retryCount) * 1000;
                     await new Promise(resolve => setTimeout(resolve, delay));
                     return await fetchAPI(payload, retryCount + 1);
                 } else {
-                    console.error("API Call failed after 5 retries:", error);
-                    state.useLocalFallback = true;
-                    renderConnectionStatus();
-                    showToast("ไม่สามารถเข้าถึงคลาวด์ได้ สลับมาใช้ระบบสำรองอัตโนมัติ", "error");
-                    return simulateLocalAPI(payload);
+                    console.error("API Connection failure:", error);
+                    showToast("ไม่สามารถเชื่อมต่อฐานข้อมูลคลาวด์ได้ กรุณาตรวจสอบสิทธิ์เว็บแอปหรืออินเทอร์เน็ต", "error");
+                    throw error;
                 }
             }
         }
 
-        // จำลอง API ทำงานใน Local สำหรับทดสอบทันใจ
-        function simulateLocalAPI(payload) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const action = payload.action;
-                    if (action === 'getInitialData') {
-                        resolve({
-                            status: 'success',
-                            menus: dbEngine.getMenus(),
-                            categories: dbEngine.getCategories(),
-                            logs: dbEngine.getLogs()
-                        });
-                    } else if (action === 'login') {
-                        if (payload.password === 'minimal1234') {
-                            resolve({ status: 'success', token: 'mock-session-token-' + Date.now() });
-                        } else {
-                            resolve({ status: 'error', message: 'รหัสผ่านสำหรับเข้าสู่ระบบไม่ถูกต้อง' });
-                        }
-                    } else if (action === 'addMenu') {
-                        const menus = dbEngine.getMenus();
-                        const maxIdNum = menus.reduce((max, item) => {
-                            const num = parseInt(item.id.replace('MN', ''), 10);
-                            return num > max ? num : max;
-                        }, 0);
-                        const nextId = "MN" + String(maxIdNum + 1).padStart(5, '0');
-
-                        const newMenu = {
-                            id: nextId,
-                            name: payload.data.name,
-                            price: parseFloat(payload.data.price),
-                            description: payload.data.description,
-                            imageUrl: payload.data.imageUrl || "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=600",
-                            category: payload.data.category,
-                            status: payload.data.status,
-                            createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19),
-                            updatedAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
-                        };
-                        
-                        menus.push(newMenu);
-                        dbEngine.saveMenus(menus);
-                        dbEngine.addLog("เพิ่มเมนู", newMenu.id, newMenu.name, `เพิ่มเมนูใหม่ ราคา ${newMenu.price} บาท`);
-                        
-                        resolve({ status: 'success', data: newMenu });
-                    } else if (action === 'updateMenu') {
-                        const menus = dbEngine.getMenus();
-                        const idx = menus.findIndex(m => m.id === payload.data.id);
-                        if (idx !== -1) {
-                            menus[idx] = {
-                                ...menus[idx],
-                                name: payload.data.name,
-                                price: parseFloat(payload.data.price),
-                                description: payload.data.description,
-                                imageUrl: payload.data.imageUrl || menus[idx].imageUrl,
-                                category: payload.data.category,
-                                status: payload.data.status,
-                                updatedAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
-                            };
-                            dbEngine.saveMenus(menus);
-                            dbEngine.addLog("แก้ไขเมนู", payload.data.id, payload.data.name, "แก้ไขปรับปรุงรายละเอียดเมนูอาหารเรียบร้อย");
-                            resolve({ status: 'success', data: menus[idx] });
-                        } else {
-                            resolve({ status: 'error', message: 'ไม่พบ ID เมนูอาหาร' });
-                        }
-                    } else if (action === 'deleteMenu') {
-                        const menus = dbEngine.getMenus();
-                        const menu = menus.find(m => m.id === payload.id);
-                        const filtered = menus.filter(m => m.id !== payload.id);
-                        dbEngine.saveMenus(filtered);
-                        dbEngine.addLog("ลบเมนู", payload.id, menu ? menu.name : "ไม่ระบุ", "ลบข้อมูลเมนูออกจากระบบถาวร");
-                        resolve({ status: 'success' });
-                    } else if (action === 'addCategory') {
-                        const categories = dbEngine.getCategories();
-                        const maxIdNum = categories.filter(c => c.id !== 'CAT001').reduce((max, item) => {
-                            const num = parseInt(item.id.replace('CAT', ''), 10);
-                            return num > max ? num : max;
-                        }, 0);
-                        const nextId = "CAT" + String(maxIdNum + 1).padStart(3, '0');
-                        
-                        const newCat = {
-                            id: nextId,
-                            name: payload.name,
-                            createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19),
-                            updatedAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
-                        };
-                        categories.push(newCat);
-                        dbEngine.saveCategories(categories);
-                        dbEngine.addLog("เพิ่มหมวดหมู่", "-", payload.name, `เพิ่มหมวดหมู่บริการอาหารใหม่ ${payload.name}`);
-                        resolve({ status: 'success', data: newCat });
-                    } else if (action === 'deleteCategory') {
-                        const categories = dbEngine.getCategories();
-                        const filtered = categories.filter(c => c.name !== payload.name);
-                        dbEngine.saveCategories(filtered);
-                        dbEngine.addLog("ลบหมวดหมู่", "-", payload.name, `ลบหมวดหมู่ ${payload.name} ออกจากระบบถาวร`);
-                        resolve({ status: 'success' });
-                    } else {
-                        resolve({ status: 'error', message: 'ไม่พบ Action' });
-                    }
-                }, 300);
-            });
-        }
-
         // ==========================================
-        // 4. CORE CONTROLLERS & DATA REFRESH
+        // 3. CORE CONTROLLERS & DATA REFRESH
         // ==========================================
         async function loadData() {
             toggleSkeleton(true);
             try {
                 const result = await fetchAPI({ action: "getInitialData" });
                 if (result && result.status === 'success') {
-                    state.menus = result.menus;
-                    state.categories = result.categories;
+                    state.menus = result.menus || [];
+                    state.categories = result.categories || [];
                     state.logs = result.logs || [];
                     
                     renderCategoryFilters();
                     renderMenuGrid();
                     updateAdminDashboard();
                 } else {
-                    showToast("ไม่สามารถประมวลผลข้อมูลจากระบบคลาวด์ได้สำเร็จ", "error");
+                    showToast("ไม่สามารถดึงข้อมูลจากโครงสร้างคลาวด์ชีตได้สำเร็จ", "error");
                 }
             } catch (err) {
                 console.error("Initialization failure", err);
-                showToast("โหลดข้อมูลล้มเหลว กำลังดำเนินงานบนโหมดสำรองของระบบหลังบ้าน...", "error");
-                
-                // ดึงข้อมูลสำรองจาก LocalStorage แทนในกรณีมีปัญหาการเชื่อมต่อ
-                state.menus = dbEngine.getMenus();
-                state.categories = dbEngine.getCategories();
-                state.logs = dbEngine.getLogs();
-                renderCategoryFilters();
-                renderMenuGrid();
+                showToast("ล้มเหลวในการเชื่อมต่อ ดำเนินการลองเชื่อมต่ออีกครั้งเมื่อเครือข่ายพร้อม", "error");
             } finally {
                 renderConnectionStatus();
                 toggleSkeleton(false);
@@ -1052,7 +740,7 @@
         }
 
         // ==========================================
-        // 5. RENDERING PUBLIC WEBPAGE
+        // 4. RENDERING PUBLIC WEBPAGE
         // ==========================================
         function renderCategoryFilters() {
             const container = document.getElementById("category-bar");
@@ -1118,7 +806,7 @@
                         <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
                             <div class="space-y-1.5">
                                 <h4 class="font-bold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors duration-300 text-base md:text-lg">${item.name}</h4>
-                                <p class="text-xs text-gray-400 font-light line-clamp-2 leading-relaxed">${item.description || 'เชฟจัดเสิร์ฟสูตรแซ่บสะเด็ดสะกุ้งกะดิ้ง...'}</p>
+                                <p class="text-xs text-gray-400 font-light line-clamp-2 leading-relaxed">${item.description || 'สูตรต้นตำรับแซ่บสะเด็ดสะกุ้งกะดิ้ง...'}</p>
                             </div>
                             
                             <div class="flex items-center justify-between pt-2 border-t border-gray-50">
@@ -1148,7 +836,7 @@
         }
 
         // ==========================================
-        // 6. DETAILED MODAL VIEWER FOR USER
+        // 5. DETAILED MODAL VIEWER FOR USER
         // ==========================================
         function openMenuDetailModal(menuId) {
             const item = state.menus.find(m => m.id === menuId);
@@ -1188,7 +876,7 @@
         }
 
         // ==========================================
-        // 7. ADMIN AUTHENTICATION GATEWAY
+        // 6. ADMIN AUTHENTICATION GATEWAY
         // ==========================================
         function checkSessionToken() {
             const token = localStorage.getItem("minimaliste_admin_session");
@@ -1267,7 +955,7 @@
         }
 
         // ==========================================
-        // 8. ADMIN DASHBOARD VIEW ENGINE & CRUD
+        // 7. ADMIN DASHBOARD VIEW ENGINE & CRUD
         // ==========================================
         function navigate(viewName) {
             state.currentView = viewName;
@@ -1430,7 +1118,7 @@
         }
 
         // ==========================================
-        // 9. IMAGE UPLOAD & PREVIEW LOGIC
+        // 8. IMAGE UPLOAD & PREVIEW LOGIC
         // ==========================================
         function processImageFile(file) {
             if (!file) return;
@@ -1458,23 +1146,8 @@
             processImageFile(file);
         }
 
-        function handleImageDrop(e) {
-            e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            processImageFile(file);
-        }
-
-        function resetImageUpload(e) {
-            if (e) e.stopPropagation();
-            state.activeFormImageBase64 = null;
-            state.activeFormImageName = null;
-            document.getElementById("form-menu-image-file").value = "";
-            document.getElementById("dropzone-placeholder").classList.remove("hidden");
-            document.getElementById("dropzone-preview").classList.add("hidden");
-        }
-
         // ==========================================
-        // 10. MODAL FORM: CREATE / EDIT MENU
+        // 9. MODAL FORM: CREATE / EDIT MENU
         // ==========================================
         function openMenuFormModal(mode, menuId = "") {
             const form = document.getElementById("menu-form");
@@ -1572,7 +1245,7 @@
                 }
             } catch (err) {
                 console.error("Submit failure", err);
-                showToast("การเชื่อมต่อฐานข้อมูลขัดข้อง ข้อมูลถูกจัดเก็บชั่วคราวบนอุปกรณ์ของคุณแทน", "error");
+                showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาตรวจสอบสิทธิ์และการเชื่อมต่อ", "error");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "บันทึกข้อมูลเมนู";
@@ -1580,7 +1253,7 @@
         }
 
         // ==========================================
-        // 11. CATEGORY MANAGEMENT CONTROLLER
+        // 10. CATEGORY MANAGEMENT CONTROLLER
         // ==========================================
         function openCategoryManagerModal() {
             renderCategoryManagerList();
@@ -1678,7 +1351,7 @@
         }
 
         // ==========================================
-        // 12. SECURITY MODAL: DELETE CONFIRMATION
+        // 11. SECURITY MODAL: DELETE CONFIRMATION
         // ==========================================
         let onDeleteConfirmCallback = null;
 
@@ -1727,7 +1400,7 @@
         }
 
         // ==========================================
-        // 13. APP ENTRY POINT & SETUP WINDOW ONLOAD
+        // 12. APP ENTRY POINT & SETUP WINDOW ONLOAD
         // ==========================================
         window.onload = function() {
             document.getElementById("header-brand-name").innerText = "ส้มตำเอเอ้";
