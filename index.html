@@ -1,1418 +1,823 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ส้มตำเอเอ้สะกะดุ้งกะดิ้ง - Modern Digital Menu Platform</title>
-    <!-- Google Fonts: Poppins & Prompt -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Prompt:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#FF6B35',
-                        secondary: '#2D2D2D',
-                        customBg: '#F8F9FA',
-                    },
-                    fontFamily: {
-                        sans: ['Prompt', 'sans-serif'],
-                        display: ['Poppins', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        premium: '0 10px 30px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
-                        luxury: '0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 1px 10px rgba(0, 0, 0, 0.03)',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Prompt', sans-serif;
-            background-color: #F8F9FA;
-            scroll-behavior: smooth;
-        }
-        .font-display {
-            font-family: 'Poppins', sans-serif;
-        }
-        /* Custom scrollbar for premium feel */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F1F1F1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #D1D1D1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #A1A1A1;
-        }
-        /* Hide scrollbar for elements while keeping scroll functionality */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Digital Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF6B35;
+      --secondary: #2D2D2D;
+      --bg: #F8F9FA;
+      --white: #FFFFFF;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: var(--bg);
+      color: var(--secondary);
+      line-height: 1.5;
+    }
+    h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+
+    /* Public View */
+    #publicView { display: block; }
+    .hero {
+      background-size: cover;
+      background-position: center;
+      height: 60vh;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .hero-overlay {
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      width: 100%;
+    }
+    .hero-overlay h1 { font-size: 2.5rem; }
+    .hero-overlay p { font-size: 1.2rem; opacity: 0.9; }
+    .search-filter-container {
+      position: sticky;
+      top: 0;
+      background: var(--white);
+      z-index: 10;
+      padding: 15px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .search-box input {
+      width: 100%;
+      padding: 12px 20px;
+      border: 2px solid #eee;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-family: 'Prompt', sans-serif;
+      outline: none;
+      transition: 0.3s;
+    }
+    .search-box input:focus { border-color: var(--primary); }
+    .category-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .cat-btn {
+      background: #f0f0f0;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Prompt', sans-serif;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .cat-btn.active, .cat-btn:hover { background: var(--primary); color: white; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    @media (max-width: 600px) { .menu-grid { grid-template-columns: 1fr; } }
+    .menu-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      animation: fadeIn 0.5s ease;
+    }
+    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
+    .menu-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    .menu-card:hover img { transform: scale(1.05); }
+    .card-body { padding: 15px; }
+    .card-body h3 { font-size: 1.2rem; margin-bottom: 5px; }
+    .card-body .price { color: var(--primary); font-weight: 600; font-size: 1.2rem; }
+    .skeleton {
+      background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 20px;
+      height: 320px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    /* Modal public */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      animation: fadeInOverlay 0.3s;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.4s ease;
+    }
+    .modal-content img { width: 100%; height: 300px; object-fit: cover; }
+    .modal-info { padding: 20px; }
+    .modal-close {
+      position: absolute;
+      top: 15px; right: 15px;
+      background: white;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      line-height: 1;
+    }
+    .modal-price { font-size: 1.8rem; font-weight: bold; color: var(--primary); }
+    .modal-category { display: inline-block; background: #f0f0f0; padding: 5px 15px; border-radius: 20px; margin-top: 10px; }
+    @keyframes fadeInOverlay { from { opacity:0 } to { opacity:1 } }
+    @keyframes slideUp { from { transform: translateY(50px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+
+    /* Admin View */
+    #adminView { display: none; }
+    .login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      text-align: center;
+      padding: 30px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .login-container input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Prompt', sans-serif;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .kpi-cards {
+      display: flex;
+      gap: 15px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    .kpi-card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .stats-section, .recent-activities, .menu-management, .category-management {
+      margin: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+    .modal {
+      display: none;
+      position: fixed;
+      top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+    }
+    .modal.active { display:flex; }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .drop-zone {
+      border: 2px dashed #ccc;
+      padding: 30px;
+      text-align: center;
+      margin: 10px 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: 'Prompt', sans-serif;
+    }
+    .close { float: right; font-size: 1.5rem; cursor: pointer; }
+    footer { text-align: center; padding: 20px; }
+    .admin-link { color: var(--primary); text-decoration: none; font-weight: 500; }
+  </style>
 </head>
-<body class="text-secondary antialiased overflow-x-hidden">
+<body>
 
-    <!-- CONFIGURATION & API ENGINE GATEWAY -->
-    <script>
-        // ----------------------------------------------------
-        // CONFIGURATION WITH YOUR LIVE GOOGLE APPS SCRIPT URL
-        // ----------------------------------------------------
-        const CONFIG = {
-            gasUrl: "https://script.google.com/macros/s/AKfycbwskWYc3CDz7T6MT7Shf7sdmieVI7SMSFauOgX_ISZIyTVvIdhwexVZZFCH1CpeDHOy/exec",
-            restaurantName: "ส้มตำเอเอ้สะกะดุ้งกะดิ้ง",
-            restaurantSlogan: "พิกัดร้านชานู้ดาว | แซ่บสะกุ้งกะดิ้ง เข้าร่วมโครงการ 60/40 คนละครึ่งคั่วแม่ เริดเลยละ! เริ่มต้นความอร่อย 1 มิ.ย. นี้",
-            heroImage: "https://images.unsplash.com/photo-1559847844-5315be91338e?auto=format&fit=crop&q=80&w=1920"
-        };
-    </script>
+<!-- ==================== PUBLIC VIEW ==================== -->
+<div id="publicView">
+  <header class="hero" id="hero">
+    <div class="hero-overlay">
+      <h1 id="siteName">ร้านอาหาร</h1>
+      <p id="heroTagline">ส้มตำแซ่บ อีสานแท้</p>
+    </div>
+  </header>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+  <div class="search-filter-container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 ค้นหาเมนู..." autocomplete="off">
+    </div>
+    <div class="category-filter" id="categoryFilter">
+      <button class="cat-btn active" data-category="all">ทั้งหมด</button>
+    </div>
+  </div>
 
-    <!-- MAIN APP WRAPPER -->
-    <div id="app" class="min-h-screen flex flex-col">
-        
-        <!-- HEADER / NAVIGATION -->
-        <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                <!-- Logo -->
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('home')">
-                    <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white font-display font-bold text-lg shadow-md">A</div>
-                    <span class="font-display font-bold text-xl tracking-wider text-secondary transition-colors duration-300 hover:text-primary" id="header-brand-name">เอเอ้สะกะดุ้งกะดิ้ง</span>
-                </div>
-                
-                <!-- Nav Actions -->
-                <div class="flex items-center space-x-4">
-                    <!-- Status Indicator Pill -->
-                    <div id="status-pill-container"></div>
+  <main class="menu-grid" id="menuGrid"></main>
 
-                    <button id="nav-home-btn" onclick="navigate('home')" class="text-sm font-medium text-primary border-b-2 border-primary pb-1 transition-all">เมนูหลัก</button>
-                    <button id="nav-admin-btn" onclick="openAdminPortal()" class="flex items-center space-x-1.5 px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
-                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                        <span>ผู้จัดการระบบ</span>
-                    </button>
-                    <!-- Admin Logout Button (Initially Hidden) -->
-                    <button id="admin-logout-btn" onclick="handleLogout()" class="hidden flex items-center space-x-1.5 px-4 py-2 rounded-full bg-red-50 text-red-600 border border-red-100 text-sm font-medium hover:bg-red-100 transition-all">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span>ออกจากระบบ</span>
-                    </button>
-                </div>
-            </div>
-        </header>
+  <!-- Menu Detail Modal -->
+  <div class="modal-overlay" id="menuModal">
+    <div class="modal-content">
+      <button class="modal-close" id="menuModalClose">&times;</button>
+      <img id="modalImage" src="" alt="Menu Image">
+      <div class="modal-info">
+        <h2 id="modalName"></h2>
+        <span class="modal-price" id="modalPrice"></span>
+        <p id="modalDescription"></p>
+        <span class="modal-category" id="modalCategory"></span>
+      </div>
+    </div>
+  </div>
 
-        <!-- PUBLIC WEBSITE SCREEN -->
-        <main id="screen-public" class="flex-grow">
-            <!-- HERO BANNER -->
-            <section class="relative h-[45vh] min-h-[350px] flex items-center justify-center overflow-hidden">
-                <div class="absolute inset-0 bg-black/40 z-10"></div>
-                <img id="hero-bg-img" class="absolute inset-0 w-full h-full object-cover transform scale-105 transition-transform duration-1000" src="" alt="Restaurant Banner">
-                <div class="relative z-20 text-center px-4 max-w-3xl mx-auto text-white">
-                    <h1 class="font-display font-bold text-4xl md:text-5xl lg:text-6xl tracking-tight mb-4 drop-shadow-sm" id="hero-title"></h1>
-                    <p class="text-sm md:text-base text-gray-200 font-light max-w-2xl mx-auto leading-relaxed drop-shadow-sm" id="hero-slogan"></p>
-                </div>
-            </section>
+  <footer>
+    <a href="#" class="admin-link" id="goToAdmin">🔐 Admin</a>
+  </footer>
+</div>
 
-            <!-- SEARCH & FILTER STICKY BAR -->
-            <section class="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <!-- Category Filters Slider -->
-                        <div class="w-full md:w-2/3 overflow-x-auto no-scrollbar flex items-center space-x-2 py-1" id="category-bar">
-                            <!-- Categories are generated here -->
-                            <div class="h-8 w-24 bg-gray-100 rounded-full animate-pulse"></div>
-                            <div class="h-8 w-24 bg-gray-100 rounded-full animate-pulse"></div>
-                            <div class="h-8 w-24 bg-gray-100 rounded-full animate-pulse"></div>
-                        </div>
+<!-- ==================== ADMIN VIEW ==================== -->
+<div id="adminView">
+  <!-- Login Box (shown if not logged in) -->
+  <div id="loginBox" class="login-container">
+    <h2>🔐 Admin Login</h2>
+    <input type="password" id="passwordInput" placeholder="Password">
+    <button id="loginBtn">เข้าสู่ระบบ</button>
+    <p id="loginError" style="color:red;"></p>
+  </div>
 
-                        <!-- Real-time Search Input -->
-                        <div class="w-full md:w-1/3 relative">
-                            <input type="text" id="menu-search" oninput="handleSearch(this.value)" placeholder="ค้นหาเมนูพรีเมียมที่คุณโปรดปราน..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
-                            <i data-lucide="search" class="absolute left-3.5 top-3 w-4.5 h-4.5 text-gray-400"></i>
-                        </div>
-                    </div>
-                </div>
-            </section>
+  <!-- Dashboard (hidden initially) -->
+  <div id="dashboardBox" style="display:none;">
+    <header class="admin-header">
+      <h1>📊 Dashboard</h1>
+      <button id="logoutBtn">ออกจากระบบ</button>
+    </header>
 
-            <!-- MAIN MENU GRID / DISPLAY -->
-            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h2 class="text-2xl font-bold tracking-tight text-secondary" id="selected-category-title">เมนูทั้งหมด</h2>
-                        <p class="text-xs text-gray-500 mt-1" id="menu-count-badge">กำลังโหลดรายการอาหาร...</p>
-                    </div>
-                </div>
+    <div class="kpi-cards" id="kpiCards"></div>
 
-                <!-- Skeleton Loader Container -->
-                <div id="menu-skeleton-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    <!-- Skeletons generated via JS -->
-                </div>
-
-                <!-- Actual Menu Items Container -->
-                <div id="menu-items-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    <!-- Cards injected via JS -->
-                </div>
-
-                <!-- Empty State -->
-                <div id="menu-empty-state" class="hidden text-center py-20">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="folder-open" class="w-8 h-8 text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-700">ไม่พบรายการเมนูที่ค้นหา</h3>
-                    <p class="text-sm text-gray-400 mt-1">ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่นดูสิคะ</p>
-                </div>
-            </section>
-        </main>
-
-        <!-- ADMIN DASHBOARD SYSTEM SCREEN (Initially Hidden) -->
-        <main id="screen-admin" class="hidden flex-grow bg-slate-50">
-            <!-- Admin Secondary Nav/Toolbar -->
-            <div class="bg-white border-b border-gray-200">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="p-2 bg-primary/10 rounded-lg text-primary">
-                            <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-bold text-gray-800">ระบบจัดการหลังบ้าน</h2>
-                            <p class="text-xs text-gray-400">อัปเดตเมนู หมวดหมู่ และตรวจสอบการทำงานแบบเรียลไทม์</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center space-x-2">
-                        <button onclick="openCategoryManagerModal()" class="flex items-center space-x-1 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all shadow-sm">
-                            <i data-lucide="folder-cog" class="w-4 h-4"></i>
-                            <span>จัดการหมวดหมู่</span>
-                        </button>
-                        <button onclick="openMenuFormModal('create')" class="flex items-center space-x-1 px-4 py-2 bg-primary hover:bg-primary/95 text-white rounded-lg text-sm font-medium transition-all shadow-sm">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
-                            <span>เพิ่มเมนูใหม่</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DASHBOARD MAIN PANEL -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-                
-                <!-- KPI SUMMARY CARDS -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- KPI 1 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-premium flex items-center space-x-4">
-                        <div class="p-3.5 bg-amber-50 rounded-xl text-amber-500">
-                            <i data-lucide="utensils" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs text-gray-400 font-medium block">เมนูอาหารทั้งหมด</span>
-                            <span id="kpi-total-menus" class="text-2xl font-bold text-secondary">0</span>
-                        </div>
-                    </div>
-                    <!-- KPI 2 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-premium flex items-center space-x-4">
-                        <div class="p-3.5 bg-blue-50 rounded-xl text-blue-500">
-                            <i data-lucide="layers" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs text-gray-400 font-medium block">หมวดหมู่ทั้งหมด</span>
-                            <span id="kpi-total-categories" class="text-2xl font-bold text-secondary">0</span>
-                        </div>
-                    </div>
-                    <!-- KPI 3 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-premium flex items-center space-x-4">
-                        <div class="p-3.5 bg-emerald-50 rounded-xl text-emerald-500">
-                            <i data-lucide="image" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs text-gray-400 font-medium block">จำนวนรูปภาพในคลาวด์</span>
-                            <span id="kpi-total-images" class="text-2xl font-bold text-secondary">0</span>
-                        </div>
-                    </div>
-                    <!-- KPI 4 -->
-                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-premium flex items-center space-x-4">
-                        <div class="p-3.5 bg-purple-50 rounded-xl text-purple-500">
-                            <i data-lucide="calendar" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs text-gray-400 font-medium block">อัปเดตระบบล่าสุด</span>
-                            <span id="kpi-last-updated" class="text-sm font-semibold text-secondary">กำลังคำนวณ...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- STATISTICS & RECENT LOGS SECTION -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Category Stats Breakdown -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-premium p-6 lg:col-span-1 flex flex-col">
-                        <h3 class="font-bold text-gray-800 text-sm mb-4 flex items-center space-x-2">
-                            <i data-lucide="pie-chart" class="w-4 h-4 text-gray-500"></i>
-                            <span>จำนวนเมนูแยกตามหมวดหมู่</span>
-                        </h3>
-                        <div id="category-stats-list" class="space-y-4 overflow-y-auto max-h-[320px] flex-grow pr-1">
-                            <!-- Dynamic stats bars generated by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity Logs -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-premium p-6 lg:col-span-2 flex flex-col">
-                        <h3 class="font-bold text-gray-800 text-sm mb-4 flex items-center justify-between">
-                            <span class="flex items-center space-x-2">
-                                <i data-lucide="clock" class="w-4 h-4 text-gray-500"></i>
-                                <span>ประวัติกิจกรรมและระบบความปลอดภัย (Logs)</span>
-                            </span>
-                            <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">บันทึกล่าสุด 10 รายการ</span>
-                        </h3>
-                        <div id="activity-logs-container" class="space-y-3 overflow-y-auto max-h-[320px] flex-grow pr-1">
-                            <!-- Log rows generated by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MENU LIST TABLE / DATA MANAGER -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-premium overflow-hidden">
-                    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                            <h3 class="font-bold text-gray-800">รายการเมนูทั้งหมด</h3>
-                            <p class="text-xs text-gray-400">ค้นหา แก้ไข เปลี่ยนแปลงสถานะ หรือลบรายการเมนูจากระบบ</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <input type="text" id="admin-menu-search" oninput="handleAdminSearch(this.value)" placeholder="ค้นหารหัส หรือชื่อเมนู..." class="pl-9 pr-4 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-primary focus:outline-none w-56">
-                            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute ml-3 pointer-events-none"></i>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 font-semibold tracking-wider">
-                                    <th class="py-4 px-6">ID</th>
-                                    <th class="py-4 px-6">รูปภาพ</th>
-                                    <th class="py-4 px-6">ชื่อเมนู</th>
-                                    <th class="py-4 px-6">หมวดหมู่</th>
-                                    <th class="py-4 px-6">ราคา</th>
-                                    <th class="py-4 px-6">สถานะ</th>
-                                    <th class="py-4 px-6">อัปเดตเมื่อ</th>
-                                    <th class="py-4 px-6 text-center">จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-menu-table-body" class="divide-y divide-gray-100 text-sm text-gray-600">
-                                <!-- Table rows injected by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Empty Search on Admin -->
-                    <div id="admin-table-empty" class="hidden text-center py-10">
-                        <p class="text-sm text-gray-400">ไม่พบรายการเมนูที่ต้องการค้นหา</p>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-
-        <!-- FOOTER -->
-        <footer class="bg-secondary text-white py-12 mt-auto border-t border-gray-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div class="text-center md:text-left">
-                        <div class="flex items-center justify-center md:justify-start space-x-2 font-display font-bold tracking-widest text-lg text-white mb-2" id="footer-brand">ส้มตำเอเอ้สะกะดุ้งกะดิ้ง</div>
-                        <p class="text-xs text-gray-400 font-light" id="footer-slogan">สุนทรียภาพแห่งการรับประทานอาหารยุคดิจิทัลอย่างสมบูรณ์แบบ</p>
-                    </div>
-                    <div class="text-center md:text-right">
-                        <p class="text-xs text-gray-500">&copy; 2026 ส้มตำเอเอ้สะกะดุ้งกะดิ้ง. สงวนลิขสิทธิ์ทั้งหมด</p>
-                        <p class="text-[10px] text-gray-600 mt-1">พัฒนาระดับพรีเมียมด้วยความใส่ใจและนวัตกรรมใหม่</p>
-                    </div>
-                </div>
-            </div>
-        </footer>
-
-        <!-- MODAL 1: FULL SCREEN MENU DETAIL (FOR USERS) -->
-        <div id="modal-menu-detail" class="fixed inset-0 z-50 overflow-y-auto hidden pointer-events-none">
-            <!-- Backdrop -->
-            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 opacity-0" id="detail-backdrop" onclick="closeMenuDetailModal()"></div>
-            <!-- Center Content Container -->
-            <div class="flex items-center justify-center min-h-screen p-4 md:p-6 relative">
-                <!-- Modal Box -->
-                <div class="bg-white w-full max-w-4xl rounded-2xl md:rounded-3xl shadow-luxury overflow-hidden transform scale-95 opacity-0 transition-all duration-300 pointer-events-auto flex flex-col md:flex-row max-h-[90vh] md:max-h-[80vh]" id="detail-box">
-                    <!-- Image Wrapper -->
-                    <div class="w-full md:w-1/2 relative h-64 md:h-auto bg-gray-100 flex items-center justify-center">
-                        <img id="detail-img" class="w-full h-full object-cover" src="" alt="">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-                        <!-- Absolute Category Badge on Image for Mobile -->
-                        <span id="detail-category-badge" class="absolute bottom-4 left-4 text-xs font-semibold px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-secondary shadow-sm">ส้มตำ</span>
-                    </div>
-                    <!-- Info Wrapper -->
-                    <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-between overflow-y-auto">
-                        <div class="space-y-6">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 id="detail-title" class="text-2xl md:text-3xl font-bold tracking-tight text-secondary">เมนูส้มตำรสเด็ด</h3>
-                                    <span id="detail-id" class="text-[10px] font-mono tracking-widest text-primary/80 bg-primary/5 px-2 py-0.5 rounded-md mt-1.5 inline-block">MN00001</span>
-                                </div>
-                                <button onclick="closeMenuDetailModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-all">
-                                    <i data-lucide="x" class="w-6 h-6"></i>
-                                </button>
-                            </div>
-                            
-                            <div>
-                                <h4 class="text-xs font-semibold text-gray-400 tracking-wider uppercase mb-2">รายละเอียดเมนู</h4>
-                                <p id="detail-description" class="text-sm text-gray-600 leading-relaxed font-light">คำอธิบายรายละเอียดเมนูอาหารที่ถูกจัดเสิร์ฟด้วยเครื่องเคียงคัดสรรพิเศษอย่างพิถีพิถัน ปราศจากสารแต่งสีและสารกันเสีย</p>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 border-t border-b border-gray-100 py-4">
-                                <div>
-                                    <span class="text-xs text-gray-400 block mb-0.5">สถานะการผลิต</span>
-                                    <span class="flex items-center text-xs font-semibold text-emerald-600">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>พร้อมเสิร์ฟทันที
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="text-xs text-gray-400 block mb-0.5">ประเภท</span>
-                                    <span id="detail-type-badge" class="text-xs font-semibold text-secondary">เมนูหลัก</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-6 mt-6 border-t border-gray-100 flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-gray-400 block">ราคาสุทธิ (Net)</span>
-                                <span class="text-3xl font-display font-bold text-primary flex items-baseline">
-                                    <span id="detail-price">0</span><span class="text-xs font-normal text-gray-400 ml-1">บาท</span>
-                                </span>
-                            </div>
-                            <button onclick="closeMenuDetailModal()" class="px-8 py-3 bg-secondary hover:bg-secondary/90 text-white font-medium rounded-full text-sm transition-all shadow-md transform hover:-translate-y-0.5">
-                                ปิดหน้าต่างนี้
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL 2: ADMIN PASSWORD LOGIN -->
-        <div id="modal-login" class="fixed inset-0 z-50 overflow-y-auto hidden">
-            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAdminPortal()"></div>
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white w-full max-w-md rounded-2xl shadow-luxury p-8 relative z-10 border border-gray-100">
-                    <div class="text-center mb-6">
-                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 text-primary">
-                            <i data-lucide="lock" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-secondary">เข้าสู่ระบบผู้จัดการระบบ</h3>
-                        <p class="text-xs text-gray-400 mt-1">กรุณาระบุรหัสผ่านเพื่อเข้าใช้งาน Dashboard</p>
-                    </div>
-
-                    <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 mb-1">รหัสผ่านของระบบ (Admin Password)</label>
-                            <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all">
-                        </div>
-                        
-                        <div id="login-error" class="hidden text-xs text-red-500 flex items-center space-x-1.5 bg-red-50 p-2.5 rounded-lg border border-red-100">
-                            <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
-                            <span id="login-error-msg">รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</span>
-                        </div>
-
-                        <button type="submit" id="login-submit-btn" class="w-full py-2.5 bg-secondary hover:bg-secondary/95 text-white font-medium rounded-lg text-sm transition-all shadow-md flex items-center justify-center space-x-2">
-                            <span>ยืนยันเข้าสู่ระบบ</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL 3: ADMIN CREATE / EDIT MENU FORM -->
-        <div id="modal-menu-form" class="fixed inset-0 z-50 overflow-y-auto hidden">
-            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeMenuFormModal()"></div>
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white w-full max-w-xl rounded-2xl shadow-luxury overflow-hidden relative z-10 border border-gray-100">
-                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-                        <h3 id="menu-form-title" class="font-bold text-gray-800">เพิ่มเมนูอาหารใหม่</h3>
-                        <button onclick="closeMenuFormModal()" class="p-1 text-gray-400 hover:text-gray-600 rounded-full transition-all">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-
-                    <form id="menu-form" onsubmit="handleMenuFormSubmit(event)" class="p-6 space-y-4">
-                        <input type="hidden" id="menu-form-mode" value="create">
-                        <input type="hidden" id="menu-form-id" value="">
-
-                        <!-- Dual input Name & Price -->
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="col-span-2">
-                                <label class="block text-xs font-semibold text-gray-500 mb-1">ชื่อเมนูอาหาร <span class="text-red-500">*</span></label>
-                                <input type="text" id="form-menu-name" required placeholder="ตัวอย่าง: ยำปูม้าพรีเมียม" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-1">ราคา (บาท) <span class="text-red-500">*</span></label>
-                                <input type="number" id="form-menu-price" required min="0" placeholder="0" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
-                            </div>
-                        </div>
-
-                        <!-- Dropdowns Area: Category & Status -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-1">หมวดหมู่ <span class="text-red-500">*</span></label>
-                                <select id="form-menu-category" required class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
-                                    <!-- Dynamic options filled via JS -->
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-1">สถานะเริ่มต้น <span class="text-red-500">*</span></label>
-                                <select id="form-menu-status" required class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
-                                    <option value="Active">เปิดการแสดงผล (Active)</option>
-                                    <option value="Inactive">ปิดการแสดงผล (Inactive)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Description Area -->
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 mb-1">คำอธิบายรายละเอียดเมนูอาหาร</label>
-                            <textarea id="form-menu-desc" rows="3" placeholder="ระบุส่วนผสมพิเศษ หรือความพิเศษของเมนูอาหาร..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"></textarea>
-                        </div>
-
-                        <!-- Image File Drag & Drop + Direct Base64 Handling -->
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 mb-1">ภาพประกอบเมนูอาหาร <span class="text-red-500">*</span></label>
-                            <div id="dropzone" class="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors duration-300 relative bg-gray-50 min-h-[140px]" ondragover="event.preventDefault()" ondrop="handleImageDrop(event)">
-                                <input type="file" id="form-menu-image-file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleImageSelect(event)">
-                                
-                                <div id="dropzone-placeholder" class="text-center space-y-2">
-                                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm mx-auto text-gray-400">
-                                        <i data-lucide="cloud-upload" class="w-5 h-5"></i>
-                                    </div>
-                                    <p class="text-xs text-gray-500"><span class="font-semibold text-primary">คลิกที่นี่เพื่อเลือกรูป</span> หรือ ลากไฟล์วางลงกล่องนี้</p>
-                                    <p class="text-[10px] text-gray-400">รองรับนามสกุล JPG, PNG, GIF</p>
-                                </div>
-
-                                <div id="dropzone-preview" class="hidden w-full flex flex-col items-center">
-                                    <img id="image-preview" src="" class="h-28 object-cover rounded-lg shadow-sm border border-gray-200 mb-2 max-w-full">
-                                    <span class="text-[10px] text-gray-400 font-mono truncate max-w-xs" id="image-preview-filename"></span>
-                                    <button type="button" onclick="resetImageUpload(event)" class="text-xs text-red-500 hover:underline mt-1">ลบรูปภาพนี้</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="pt-4 border-t border-gray-100 flex items-center justify-end space-x-2">
-                            <button type="button" onclick="closeMenuFormModal()" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-xs font-medium hover:bg-gray-50 transition-all">ยกเลิก</button>
-                            <button type="submit" id="menu-form-submit-btn" class="px-5 py-2 bg-primary hover:bg-primary/95 text-white rounded-lg text-xs font-medium transition-all shadow-sm">บันทึกข้อมูลเมนู</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL 4: CATEGORY MANAGEMENT MODAL -->
-        <div id="modal-category-manager" class="fixed inset-0 z-50 overflow-y-auto hidden">
-            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCategoryManagerModal()"></div>
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white w-full max-w-md rounded-2xl shadow-luxury overflow-hidden relative z-10 border border-gray-100">
-                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-                        <h3 class="font-bold text-gray-800">จัดการหมวดหมู่เมนู</h3>
-                        <button onclick="closeCategoryManagerModal()" class="p-1 text-gray-400 hover:text-gray-600 rounded-full transition-all">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-
-                    <div class="p-6 space-y-6">
-                        <!-- Add Category Form -->
-                        <div>
-                            <form id="category-add-form" onsubmit="handleCategoryAdd(event)" class="flex gap-2">
-                                <input type="text" id="new-category-name" required placeholder="เพิ่มชื่อหมวดหมู่ใหม่..." class="flex-grow px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-primary focus:outline-none">
-                                <button type="submit" class="px-4 py-1.5 bg-secondary text-white rounded-lg text-xs font-medium hover:bg-secondary/90 transition-all shadow-sm">
-                                    เพิ่มหมวดหมู่
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Categories List -->
-                        <div>
-                            <h4 class="text-xs font-semibold text-gray-400 tracking-wider uppercase mb-3">หมวดหมู่ทั้งหมด</h4>
-                            <div id="manager-category-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-1">
-                                <!-- Categories injected here -->
-                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-xs">
-                                    <span class="font-medium">ส้มตำ</span>
-                                    <button class="text-red-500 hover:bg-red-50 p-1.5 rounded-md"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL 5: CONFIRM DELETE MODAL -->
-        <div id="modal-delete-confirm" class="fixed inset-0 z-50 overflow-y-auto hidden">
-            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white w-full max-w-sm rounded-2xl shadow-luxury p-6 relative z-10 border border-gray-100 text-center">
-                    <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800">ยืนยันการลบรายการนี้?</h3>
-                    <p class="text-xs text-gray-400 mt-2 leading-relaxed" id="delete-confirm-text">คุณต้องการลบรายการอาหารนี้ออกจากระบบอย่างถาวรใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนคืนได้</p>
-                    
-                    <div class="mt-6 flex justify-center space-x-2">
-                        <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-xs font-medium hover:bg-gray-50 transition-all">ยกเลิก</button>
-                        <button id="delete-confirm-btn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-medium transition-all shadow-sm">ยืนยันการลบ</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    <div class="stats-section">
+      <h3>📈 จำนวนเมนูตามหมวดหมู่</h3>
+      <div id="categoryStats"></div>
     </div>
 
-    <!-- MAIN CORE APPLICATION ENGINE (JAVASCRIPT) -->
-    <script>
-        // ==========================================
-        // 1. DATA INITIALIZATION & CORE STATE
-        // ==========================================
-        let state = {
-            menus: [],
-            categories: [],
-            logs: [],
-            selectedCategory: "ทั้งหมด",
-            searchQuery: "",
-            adminSearchQuery: "",
-            isAdminMode: false,
-            currentView: "home",
-            activeSkeleton: true,
-            activeFormImageBase64: null,
-            activeFormImageName: null,
-            useLocalFallback: false // ปิดการบังคับโหมดจำลองเพื่อให้ทำงานร่วมกับ API โดยตรง
-        };
-
-        // ==========================================
-        // 2. UTILITIES & API COMMUNICATION (LIVE-ONLY ENGINE)
-        // ==========================================
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const id = 'toast_' + Math.random().toString(36).substr(2, 9);
-            
-            let bgClass = 'bg-secondary text-white';
-            let icon = 'info';
-            if (type === 'success') {
-                bgClass = 'bg-emerald-600 text-white';
-                icon = 'check-circle';
-            } else if (type === 'error') {
-                bgClass = 'bg-red-500 text-white';
-                icon = 'alert-octagon';
-            }
-
-            const html = `
-                <div id="${id}" class="flex items-center space-x-3 px-4 py-3 rounded-xl shadow-luxury border border-white/10 ${bgClass} pointer-events-auto transform translate-y-5 opacity-0 transition-all duration-300">
-                    <i data-lucide="${icon}" class="w-5 h-5 flex-shrink-0"></i>
-                    <span class="text-xs font-medium leading-normal">${message}</span>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', html);
-            lucide.createIcons();
-
-            const element = document.getElementById(id);
-            setTimeout(() => {
-                element.classList.remove('translate-y-5', 'opacity-0');
-            }, 50);
-
-            setTimeout(() => {
-                element.classList.add('translate-y-5', 'opacity-0');
-                setTimeout(() => {
-                    element.remove();
-                }, 300);
-            }, 4000);
-        }
-
-        // จัดการแสดงผลปุ่มระบุสถานะ Connection คลาวด์
-        function renderConnectionStatus() {
-            const container = document.getElementById("status-pill-container");
-            if (!container) return;
-
-            container.innerHTML = `
-                <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>ระบบคลาวด์ชีตออนไลน์ (Live)</span>
-                </div>
-            `;
-        }
-
-        // เรียก API ไปยัง Google Apps Script เท่านั้น (นำกลไกจำลอง Local ออกทั้งหมด)
-        async function fetchAPI(payload, retryCount = 0) {
-            if (!CONFIG.gasUrl) {
-                showToast("กรุณาระบุ CONFIG.gasUrl เพื่อใช้ทำงานกับฐานข้อมูลคลาวด์จริง", "error");
-                throw new Error("Missing gasUrl configuration");
-            }
-
-            try {
-                const response = await fetch(CONFIG.gasUrl, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error('Network response not ok');
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                if (retryCount < 5) {
-                    const delay = Math.pow(2, retryCount) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return await fetchAPI(payload, retryCount + 1);
-                } else {
-                    console.error("API Connection failure:", error);
-                    showToast("ไม่สามารถเชื่อมต่อฐานข้อมูลคลาวด์ได้ กรุณาตรวจสอบสิทธิ์เว็บแอปหรืออินเทอร์เน็ต", "error");
-                    throw error;
-                }
-            }
-        }
-
-        // ==========================================
-        // 3. CORE CONTROLLERS & DATA REFRESH
-        // ==========================================
-        async function loadData() {
-            toggleSkeleton(true);
-            try {
-                const result = await fetchAPI({ action: "getInitialData" });
-                if (result && result.status === 'success') {
-                    state.menus = result.menus || [];
-                    state.categories = result.categories || [];
-                    state.logs = result.logs || [];
-                    
-                    renderCategoryFilters();
-                    renderMenuGrid();
-                    updateAdminDashboard();
-                } else {
-                    showToast("ไม่สามารถดึงข้อมูลจากโครงสร้างคลาวด์ชีตได้สำเร็จ", "error");
-                }
-            } catch (err) {
-                console.error("Initialization failure", err);
-                showToast("ล้มเหลวในการเชื่อมต่อ ดำเนินการลองเชื่อมต่ออีกครั้งเมื่อเครือข่ายพร้อม", "error");
-            } finally {
-                renderConnectionStatus();
-                toggleSkeleton(false);
-            }
-        }
-
-        function toggleSkeleton(show) {
-            state.activeSkeleton = show;
-            const skeletonContainer = document.getElementById("menu-skeleton-container");
-            const menuGrid = document.getElementById("menu-items-grid");
-            const emptyState = document.getElementById("menu-empty-state");
-
-            if (show) {
-                skeletonContainer.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    skeletonContainer.innerHTML += `
-                        <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 p-3 space-y-4 shadow-premium">
-                            <div class="h-48 bg-gray-100 rounded-xl animate-pulse"></div>
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-                                <div class="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                                <div class="h-4 bg-gray-100 rounded w-full animate-pulse"></div>
-                            </div>
-                            <div class="flex items-center justify-between pt-2">
-                                <div class="h-6 bg-gray-200 rounded w-1/4 animate-pulse"></div>
-                                <div class="h-8 bg-gray-200 rounded-full w-20 animate-pulse"></div>
-                            </div>
-                        </div>
-                    `;
-                }
-                skeletonContainer.classList.remove("hidden");
-                menuGrid.classList.add("hidden");
-                emptyState.classList.add("hidden");
-            } else {
-                skeletonContainer.classList.add("hidden");
-            }
-        }
-
-        // ==========================================
-        // 4. RENDERING PUBLIC WEBPAGE
-        // ==========================================
-        function renderCategoryFilters() {
-            const container = document.getElementById("category-bar");
-            container.innerHTML = "";
-
-            state.categories.forEach(cat => {
-                const isSelected = state.selectedCategory === cat.name;
-                const activeClass = isSelected 
-                    ? "bg-secondary text-white font-medium shadow-md" 
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 font-light";
-
-                container.innerHTML += `
-                    <button onclick="handleCategorySelect('${cat.name}')" class="px-5 py-2 rounded-full text-xs transition-all duration-300 transform active:scale-95 flex-shrink-0 ${activeClass}">
-                        ${cat.name}
-                    </button>
-                `;
-            });
-        }
-
-        function renderMenuGrid() {
-            const grid = document.getElementById("menu-items-grid");
-            const emptyState = document.getElementById("menu-empty-state");
-            grid.innerHTML = "";
-
-            const filtered = state.menus.filter(item => {
-                const matchesSearch = item.name.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
-                                      (item.description && item.description.toLowerCase().includes(state.searchQuery.toLowerCase()));
-                const matchesCategory = state.selectedCategory === "ทั้งหมด" || item.category === state.selectedCategory;
-                const matchesStatus = item.status === "Active";
-
-                return matchesSearch && matchesCategory && matchesStatus;
-            });
-
-            const countBadge = document.getElementById("menu-count-badge");
-            countBadge.innerText = `เปิดให้บริการทั้งหมด ${filtered.length} รายการ`;
-
-            if (filtered.length === 0) {
-                grid.classList.add("hidden");
-                emptyState.classList.remove("hidden");
-                return;
-            }
-
-            emptyState.classList.add("hidden");
-            grid.classList.remove("hidden");
-
-            filtered.forEach(item => {
-                grid.innerHTML += `
-                    <div onclick="openMenuDetailModal('${item.id}')" class="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-premium transition-all duration-500 hover:shadow-luxury hover:-translate-y-1.5 cursor-pointer flex flex-col justify-between">
-                        <!-- Card Image -->
-                        <div class="relative overflow-hidden aspect-[4/3] bg-gray-100">
-                            <img class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105" 
-                                 src="${item.imageUrl}" 
-                                 alt="${item.name}"
-                                 loading="lazy">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <!-- Category tag -->
-                            <span class="absolute top-4 left-4 text-[10px] font-semibold tracking-wider px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-secondary shadow-sm">
-                                ${item.category}
-                            </span>
-                        </div>
-                        
-                        <!-- Card Details -->
-                        <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
-                            <div class="space-y-1.5">
-                                <h4 class="font-bold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors duration-300 text-base md:text-lg">${item.name}</h4>
-                                <p class="text-xs text-gray-400 font-light line-clamp-2 leading-relaxed">${item.description || 'สูตรต้นตำรับแซ่บสะเด็ดสะกุ้งกะดิ้ง...'}</p>
-                            </div>
-                            
-                            <div class="flex items-center justify-between pt-2 border-t border-gray-50">
-                                <span class="font-display font-bold text-lg text-primary">${item.price.toLocaleString()}<span class="text-[10px] font-normal text-gray-400 ml-0.5">THB</span></span>
-                                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            lucide.createIcons();
-        }
-
-        function handleCategorySelect(categoryName) {
-            state.selectedCategory = categoryName;
-            document.getElementById("selected-category-title").innerText = `เมนูหมวดหมู่: ${categoryName}`;
-            renderCategoryFilters();
-            renderMenuGrid();
-        }
-
-        function handleSearch(val) {
-            state.searchQuery = val;
-            renderMenuGrid();
-        }
-
-        // ==========================================
-        // 5. DETAILED MODAL VIEWER FOR USER
-        // ==========================================
-        function openMenuDetailModal(menuId) {
-            const item = state.menus.find(m => m.id === menuId);
-            if (!item) return;
-
-            document.getElementById("detail-title").innerText = item.name;
-            document.getElementById("detail-id").innerText = item.id;
-            document.getElementById("detail-description").innerText = item.description || "สูตรเด็ดสะกะดุ้งกะดิ้งพรีเมียมจากพิกัดร้านชานู้ดาว คลุกเคล้ารสแซ่บถูกใจทุกคนอย่างสมบูรณ์แบบ";
-            document.getElementById("detail-price").innerText = item.price.toLocaleString();
-            document.getElementById("detail-category-badge").innerText = item.category;
-            document.getElementById("detail-type-badge").innerText = `${item.category} / รสเด็ด`;
-            document.getElementById("detail-img").src = item.imageUrl;
-
-            const container = document.getElementById("modal-menu-detail");
-            const backdrop = document.getElementById("detail-backdrop");
-            const box = document.getElementById("detail-box");
-
-            container.classList.remove("hidden");
-            setTimeout(() => {
-                backdrop.classList.remove("opacity-0");
-                box.classList.remove("scale-95", "opacity-0");
-            }, 50);
-            
-            lucide.createIcons();
-        }
-
-        function closeMenuDetailModal() {
-            const backdrop = document.getElementById("detail-backdrop");
-            const box = document.getElementById("detail-box");
-
-            backdrop.classList.add("opacity-0");
-            box.classList.add("scale-95", "opacity-0");
-            
-            setTimeout(() => {
-                document.getElementById("modal-menu-detail").classList.add("hidden");
-            }, 300);
-        }
-
-        // ==========================================
-        // 6. ADMIN AUTHENTICATION GATEWAY
-        // ==========================================
-        function checkSessionToken() {
-            const token = localStorage.getItem("minimaliste_admin_session");
-            if (token) {
-                state.isAdminMode = true;
-                document.getElementById("admin-logout-btn").classList.remove("hidden");
-                document.getElementById("nav-admin-btn").classList.add("hidden");
-            }
-        }
-
-        function openAdminPortal() {
-            if (state.isAdminMode) {
-                navigate('admin');
-            } else {
-                document.getElementById("modal-login").classList.remove("hidden");
-                document.getElementById("login-password").focus();
-            }
-            lucide.createIcons();
-        }
-
-        function closeAdminPortal() {
-            document.getElementById("modal-login").classList.add("hidden");
-            document.getElementById("login-error").classList.add("hidden");
-            document.getElementById("login-password").value = "";
-        }
-
-        function handleLogout() {
-            localStorage.removeItem("minimaliste_admin_session");
-            state.isAdminMode = false;
-            showToast("ออกจากระบบหลังบ้านแล้วเรียบร้อย", "success");
-            
-            document.getElementById("admin-logout-btn").classList.add("hidden");
-            document.getElementById("nav-admin-btn").classList.remove("hidden");
-            
-            navigate('home');
-        }
-
-        async function handleLoginSubmit(e) {
-            e.preventDefault();
-            const passwordField = document.getElementById("login-password");
-            const submitBtn = document.getElementById("login-submit-btn");
-            const errorAlert = document.getElementById("login-error");
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span>กำลังตรวจสอบความถูกต้อง...</span>`;
-
-            try {
-                const result = await fetchAPI({
-                    action: "login",
-                    password: passwordField.value
-                });
-
-                if (result && result.status === 'success') {
-                    localStorage.setItem("minimaliste_admin_session", result.token);
-                    state.isAdminMode = true;
-                    
-                    showToast("เข้าสู่ระบบแผงจัดการร้านส้มตำเอเอ้สะกะดุ้งกะดิ้งสำเร็จ", "success");
-                    closeAdminPortal();
-                    
-                    document.getElementById("admin-logout-btn").classList.remove("hidden");
-                    document.getElementById("nav-admin-btn").classList.add("hidden");
-                    
-                    navigate('admin');
-                } else {
-                    errorAlert.classList.remove("hidden");
-                    document.getElementById("login-error-msg").innerText = result.message || "รหัสผ่านไม่ถูกต้อง";
-                }
-            } catch (err) {
-                errorAlert.classList.remove("hidden");
-                document.getElementById("login-error-msg").innerText = "การยืนยันตัวตนผิดพลาด กรุณาตรวจสอบการตั้งค่าหลังบ้าน";
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>ยืนยันเข้าสู่ระบบ</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-                lucide.createIcons();
-            }
-        }
-
-        // ==========================================
-        // 7. ADMIN DASHBOARD VIEW ENGINE & CRUD
-        // ==========================================
-        function navigate(viewName) {
-            state.currentView = viewName;
-            
-            const homeBtn = document.getElementById("nav-home-btn");
-            const publicScreen = document.getElementById("screen-public");
-            const adminScreen = document.getElementById("screen-admin");
-
-            if (viewName === 'home') {
-                publicScreen.classList.remove("hidden");
-                adminScreen.classList.add("hidden");
-                
-                homeBtn.classList.add("text-primary", "border-b-2", "border-primary");
-                homeBtn.classList.remove("text-gray-500");
-                renderMenuGrid();
-            } else if (viewName === 'admin') {
-                if (!state.isAdminMode) {
-                    openAdminPortal();
-                    return;
-                }
-                publicScreen.classList.add("hidden");
-                adminScreen.classList.remove("hidden");
-                
-                homeBtn.classList.remove("text-primary", "border-b-2", "border-primary");
-                homeBtn.classList.add("text-gray-500");
-                updateAdminDashboard();
-            }
-        }
-
-        function updateAdminDashboard() {
-            if (!state.isAdminMode) return;
-
-            document.getElementById("kpi-total-menus").innerText = state.menus.length;
-            const realCategories = state.categories.filter(c => c.name !== "ทั้งหมด");
-            document.getElementById("kpi-total-categories").innerText = realCategories.length;
-            
-            const totalImages = state.menus.filter(m => m.imageUrl && m.imageUrl.trim() !== "").length;
-            document.getElementById("kpi-total-images").innerText = totalImages;
-
-            if (state.menus.length > 0) {
-                const dates = state.menus.map(m => new Date(m.updatedAt || m.createdAt));
-                const latestDate = new Date(Math.max.apply(null, dates));
-                const formattedDate = latestDate.toLocaleDateString('th-TH', { 
-                    year: '2-digit', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                }) + ' น.';
-                document.getElementById("kpi-last-updated").innerText = formattedDate;
-            } else {
-                document.getElementById("kpi-last-updated").innerText = "ไม่มีข้อมูลเมนู";
-            }
-
-            const statsContainer = document.getElementById("category-stats-list");
-            statsContainer.innerHTML = "";
-            
-            realCategories.forEach(cat => {
-                const count = state.menus.filter(m => m.category === cat.name).length;
-                const percentage = state.menus.length > 0 ? Math.round((count / state.menus.length) * 100) : 0;
-                
-                statsContainer.innerHTML += `
-                    <div>
-                        <div class="flex justify-between items-center text-xs mb-1">
-                            <span class="font-medium text-gray-700">${cat.name}</span>
-                            <span class="text-gray-500 font-semibold">${count} รายการ (${percentage}%)</span>
-                        </div>
-                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                            <div class="bg-primary h-full transition-all duration-1000" style="width: ${percentage}%"></div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            const logsContainer = document.getElementById("activity-logs-container");
-            logsContainer.innerHTML = "";
-
-            if (state.logs.length === 0) {
-                logsContainer.innerHTML = `<div class="text-center py-10 text-xs text-gray-400">ยังไม่มีประวัติการกระทำใดๆ บนระบบ</div>`;
-            } else {
-                state.logs.slice(0, 10).forEach(log => {
-                    let badgeClass = "bg-sky-50 text-sky-600 border border-sky-100";
-                    if (log.action.includes("ลบ")) badgeClass = "bg-rose-50 text-rose-600 border border-rose-100";
-                    if (log.action.includes("แก้ไข")) badgeClass = "bg-amber-50 text-amber-600 border border-amber-100";
-
-                    logsContainer.innerHTML += `
-                        <div class="p-3 bg-white hover:bg-gray-50 rounded-xl border border-gray-100 transition-colors flex items-start space-x-3 text-xs">
-                            <span class="px-2 py-0.5 rounded-full font-semibold flex-shrink-0 self-start text-[10px] ${badgeClass}">${log.action}</span>
-                            <div class="flex-grow">
-                                <p class="text-gray-700 font-medium">${log.details}</p>
-                                <div class="flex justify-between items-center text-[10px] text-gray-400 mt-1">
-                                    <span>ผู้ทำ: ${log.user}</span>
-                                    <span>${log.timestamp}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            renderAdminMenuTable();
-        }
-
-        function renderAdminMenuTable() {
-            const tableBody = document.getElementById("admin-menu-table-body");
-            const emptyTable = document.getElementById("admin-table-empty");
-            tableBody.innerHTML = "";
-
-            const filtered = state.menus.filter(m => {
-                return m.id.toLowerCase().includes(state.adminSearchQuery.toLowerCase()) || 
-                       m.name.toLowerCase().includes(state.adminSearchQuery.toLowerCase()) || 
-                       m.category.toLowerCase().includes(state.adminSearchQuery.toLowerCase());
-            });
-
-            if (filtered.length === 0) {
-                tableBody.classList.add("hidden");
-                emptyTable.classList.remove("hidden");
-                return;
-            }
-
-            emptyTable.classList.add("hidden");
-            tableBody.classList.remove("hidden");
-
-            filtered.forEach(item => {
-                const statusBadge = item.status === 'Active' 
-                    ? '<span class="px-2.5 py-1 text-[10px] rounded-full bg-emerald-50 text-emerald-600 font-semibold border border-emerald-100">Active</span>'
-                    : '<span class="px-2.5 py-1 text-[10px] rounded-full bg-gray-100 text-gray-500 font-semibold border border-gray-200">Inactive</span>';
-
-                const formattedUpdate = item.updatedAt ? item.updatedAt.substring(5, 16) : item.createdAt.substring(5, 16);
-
-                tableBody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="py-3 px-6 font-mono text-xs font-semibold text-gray-800">${item.id}</td>
-                        <td class="py-3 px-6">
-                            <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
-                                <img src="${item.imageUrl}" class="w-full h-full object-cover">
-                            </div>
-                        </td>
-                        <td class="py-3 px-6 font-semibold text-gray-800">${item.name}</td>
-                        <td class="py-3 px-6"><span class="px-2 py-1 bg-slate-100 rounded-md text-xs text-slate-600">${item.category}</span></td>
-                        <td class="py-3 px-6 font-display font-semibold text-secondary">${item.price.toLocaleString()}</td>
-                        <td class="py-3 px-6">${statusBadge}</td>
-                        <td class="py-3 px-6 text-xs text-gray-400 font-mono">${formattedUpdate}</td>
-                        <td class="py-3 px-6">
-                            <div class="flex items-center justify-center space-x-2">
-                                <button onclick="openMenuFormModal('edit', '${item.id}')" class="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="แก้ไข">
-                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="triggerDeleteConfirm('${item.id}', '${item.name}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="ลบ">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            lucide.createIcons();
-        }
-
-        function handleAdminSearch(val) {
-            state.adminSearchQuery = val;
-            renderAdminMenuTable();
-        }
-
-        // ==========================================
-        // 8. IMAGE UPLOAD & PREVIEW LOGIC
-        // ==========================================
-        function processImageFile(file) {
-            if (!file) return;
-            if (!file.type.startsWith('image/')) {
-                showToast("ชนิดไฟล์ไม่ถูกต้อง กรุณาเลือกอัปโหลดเฉพาะรูปภาพเท่านั้น", "error");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                state.activeFormImageBase64 = e.target.result;
-                state.activeFormImageName = file.name;
-
-                document.getElementById("image-preview").src = e.target.result;
-                document.getElementById("image-preview-filename").innerText = file.name;
-                
-                document.getElementById("dropzone-placeholder").classList.add("hidden");
-                document.getElementById("dropzone-preview").classList.remove("hidden");
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function handleImageSelect(e) {
-            const file = e.target.files[0];
-            processImageFile(file);
-        }
-
-        // ==========================================
-        // 9. MODAL FORM: CREATE / EDIT MENU
-        // ==========================================
-        function openMenuFormModal(mode, menuId = "") {
-            const form = document.getElementById("menu-form");
-            form.reset();
-            resetImageUpload();
-
-            const selectCategory = document.getElementById("form-menu-category");
-            selectCategory.innerHTML = "";
-            state.categories.filter(c => c.name !== "ทั้งหมด").forEach(c => {
-                selectCategory.innerHTML += `<option value="${c.name}">${c.name}</option>`;
-            });
-
-            if (mode === 'create') {
-                document.getElementById("menu-form-title").innerText = "เพิ่มเมนูอาหารรสเด็ดใหม่สู่ระบบคลาวด์";
-                document.getElementById("menu-form-mode").value = "create";
-                document.getElementById("menu-form-id").value = "";
-                document.getElementById("form-menu-status").value = "Active";
-            } else if (mode === 'edit') {
-                const item = state.menus.find(m => m.id === menuId);
-                if (!item) return;
-
-                document.getElementById("menu-form-title").innerText = `แก้ไขเมนู: ${item.id}`;
-                document.getElementById("menu-form-mode").value = "edit";
-                document.getElementById("menu-form-id").value = item.id;
-
-                document.getElementById("form-menu-name").value = item.name;
-                document.getElementById("form-menu-price").value = item.price;
-                document.getElementById("form-menu-category").value = item.category;
-                document.getElementById("form-menu-status").value = item.status;
-                document.getElementById("form-menu-desc").value = item.description || "";
-
-                state.activeFormImageBase64 = null;
-                document.getElementById("image-preview").src = item.imageUrl;
-                document.getElementById("image-preview-filename").innerText = "รูปภาพปัจจุบันบนระบบ (ไม่มีการเปลี่ยนแปลงไฟล์)";
-                document.getElementById("dropzone-placeholder").classList.add("hidden");
-                document.getElementById("dropzone-preview").classList.remove("hidden");
-            }
-
-            document.getElementById("modal-menu-form").classList.remove("hidden");
-            lucide.createIcons();
-        }
-
-        function closeMenuFormModal() {
-            document.getElementById("modal-menu-form").classList.add("hidden");
-        }
-
-        async function handleMenuFormSubmit(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById("menu-form-submit-btn");
-            const mode = document.getElementById("menu-form-mode").value;
-            const menuId = document.getElementById("menu-form-id").value;
-
-            const name = document.getElementById("form-menu-name").value.trim();
-            const price = parseFloat(document.getElementById("form-menu-price").value);
-            const category = document.getElementById("form-menu-category").value;
-            const status = document.getElementById("form-menu-status").value;
-            const description = document.getElementById("form-menu-desc").value.trim();
-
-            if (!name || isNaN(price) || price < 0 || !category || !status) {
-                showToast("กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วนถูกต้อง", "error");
-                return;
-            }
-
-            if (mode === 'create' && !state.activeFormImageBase64) {
-                showToast("กรุณาเลือกไฟล์รูปภาพประกอบส้มตำ/อาหารสำหรับเมนูใหม่ด้วยครับ", "error");
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "กำลังอัปโหลดและอัปเดตระบบ...";
-
-            const payload = {
-                action: mode === 'create' ? 'addMenu' : 'updateMenu',
-                data: {
-                    id: menuId,
-                    name: name,
-                    price: price,
-                    category: category,
-                    status: status,
-                    description: description,
-                    imageStream: state.activeFormImageBase64,
-                    imageFilename: state.activeFormImageName
-                }
-            };
-
-            try {
-                const result = await fetchAPI(payload);
-                if (result && result.status === 'success') {
-                    showToast(mode === 'create' ? "เพิ่มเมนูใหม่ลงระบบสำเร็จเรียบร้อย" : "ปรับปรุงเมนูเสร็จสมบูรณ์แล้ว", "success");
-                    closeMenuFormModal();
-                    await loadData();
-                } else {
-                    showToast(result.message || "เกิดข้อผิดพลาดในการประมวลผล", "error");
-                }
-            } catch (err) {
-                console.error("Submit failure", err);
-                showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาตรวจสอบสิทธิ์และการเชื่อมต่อ", "error");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "บันทึกข้อมูลเมนู";
-            }
-        }
-
-        // ==========================================
-        // 10. CATEGORY MANAGEMENT CONTROLLER
-        // ==========================================
-        function openCategoryManagerModal() {
-            renderCategoryManagerList();
-            document.getElementById("modal-category-manager").classList.remove("hidden");
-            lucide.createIcons();
-        }
-
-        function closeCategoryManagerModal() {
-            document.getElementById("modal-category-manager").classList.add("hidden");
-        }
-
-        function renderCategoryManagerList() {
-            const list = document.getElementById("manager-category-list");
-            list.innerHTML = "";
-
-            const manageable = state.categories.filter(c => c.name !== "ทั้งหมด");
-
-            if (manageable.length === 0) {
-                list.innerHTML = `<p class="text-xs text-gray-400 text-center py-6">ไม่มีหมวดหมู่บริการอาหารในระบบ</p>`;
-                return;
-            }
-
-            manageable.forEach(cat => {
-                list.innerHTML += `
-                    <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg text-xs hover:bg-gray-100/70 transition-colors">
-                        <span class="font-semibold text-gray-700">${cat.name}</span>
-                        <button onclick="triggerCategoryDelete('${cat.name}')" class="text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-colors" title="ลบหมวดหมู่นี้">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                `;
-            });
-            lucide.createIcons();
-        }
-
-        async function handleCategoryAdd(e) {
-            e.preventDefault();
-            const input = document.getElementById("new-category-name");
-            const catName = input.value.trim();
-
-            if (!catName) return;
-
-            const exists = state.categories.some(c => c.name.toLowerCase() === catName.toLowerCase());
-            if (exists) {
-                showToast("มีหมวดหมู่ชื่อนี้อยู่ในระบบเรียบร้อยแล้ว", "error");
-                return;
-            }
-
-            try {
-                const result = await fetchAPI({
-                    action: "addCategory",
-                    name: catName
-                });
-
-                if (result && result.status === 'success') {
-                    showToast(`สร้างหมวดหมู่ "${catName}" บนระบบคลาวด์สำเร็จ`, "success");
-                    input.value = "";
-                    await loadData();
-                    renderCategoryManagerList();
-                } else {
-                    showToast(result.message || "เกิดความผิดพลาดในการส่งข้อมูล", "error");
-                }
-            } catch (err) {
-                showToast("การเชื่อมต่อเซิร์ฟเวอร์ขัดข้อง", "error");
-            }
-        }
-
-        async function triggerCategoryDelete(categoryName) {
-            const inUse = state.menus.some(m => m.category === categoryName);
-            if (inUse) {
-                showToast(`ไม่สามารถลบได้ เนื่องจากมีเมนูอาหารใช้งานหมวดหมู่นี้อยู่`, "error");
-                return;
-            }
-
-            openDeleteConfirmModal(`คุณต้องการลบหมวดหมู่ "${categoryName}" ใช่หรือไม่?`, async () => {
-                try {
-                    const result = await fetchAPI({
-                        action: "deleteCategory",
-                        name: categoryName
-                    });
-
-                    if (result && result.status === 'success') {
-                        showToast("ลบหมวดหมู่เสร็จสิ้นเรียบร้อย", "success");
-                        await loadData();
-                        renderCategoryManagerList();
-                    } else {
-                        showToast(result.message || "ไม่สามารถดำเนินการลบได้", "error");
-                    }
-                } catch (err) {
-                    showToast("เกิดความล้มเหลวในการเชื่อมต่อคลาวด์", "error");
-                } finally {
-                    closeDeleteConfirmModal();
-                }
-            });
-        }
-
-        // ==========================================
-        // 11. SECURITY MODAL: DELETE CONFIRMATION
-        // ==========================================
-        let onDeleteConfirmCallback = null;
-
-        function openDeleteConfirmModal(messageText, confirmCallback) {
-            document.getElementById("delete-confirm-text").innerText = messageText;
-            onDeleteConfirmCallback = confirmCallback;
-            
-            const modal = document.getElementById("modal-delete-confirm");
-            modal.classList.remove("hidden");
-
-            const btn = document.getElementById("delete-confirm-btn");
-            btn.onclick = async () => {
-                btn.disabled = true;
-                btn.innerText = "กำลังลบรายการ...";
-                await confirmCallback();
-                btn.disabled = false;
-                btn.innerText = "ยืนยันการลบ";
-            };
-        }
-
-        function closeDeleteConfirmModal() {
-            document.getElementById("modal-delete-confirm").classList.add("hidden");
-            onDeleteConfirmCallback = null;
-        }
-
-        function triggerDeleteConfirm(menuId, menuName) {
-            openDeleteConfirmModal(`คุณยืนยันต้องการลบเมนูอาหาร "${menuName}" (${menuId}) ออกจากระบบถาวรใช่หรือไม่?`, async () => {
-                try {
-                    const result = await fetchAPI({
-                        action: "deleteMenu",
-                        id: menuId
-                    });
-
-                    if (result && result.status === 'success') {
-                        showToast("ลบรายการส้มตำ/อาหารเสร็จสิ้น", "success");
-                        await loadData();
-                    } else {
-                        showToast(result.message || "ลบข้อมูลล้มเหลว", "error");
-                    }
-                } catch (err) {
-                    showToast("ไม่สามารถประมวลผลคำขอลบได้ในขณะนี้", "error");
-                } finally {
-                    closeDeleteConfirmModal();
-                }
-            });
-        }
-
-        // ==========================================
-        // 12. APP ENTRY POINT & SETUP WINDOW ONLOAD
-        // ==========================================
-        window.onload = function() {
-            document.getElementById("header-brand-name").innerText = "ส้มตำเอเอ้";
-            document.getElementById("footer-brand").innerText = CONFIG.restaurantName;
-            document.getElementById("footer-slogan").innerText = CONFIG.restaurantSlogan;
-            document.getElementById("hero-title").innerText = CONFIG.restaurantName;
-            document.getElementById("hero-slogan").innerText = CONFIG.restaurantSlogan;
-            document.getElementById("hero-bg-img").src = CONFIG.heroImage;
-
-            checkSessionToken();
-            loadData();
-        };
-    </script>
+    <div class="recent-activities">
+      <h3>🕒 กิจกรรมล่าสุด</h3>
+      <ul id="activityList"></ul>
+    </div>
+
+    <div class="menu-management">
+      <h2>จัดการเมนู <button id="addMenuBtn">+ เพิ่มเมนู</button></h2>
+      <table id="menuTable">
+        <thead><tr><th>รูป</th><th>ชื่อ</th><th>ราคา</th><th>หมวดหมู่</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="category-management">
+      <h2>จัดการหมวดหมู่ <button id="addCategoryBtn">+ เพิ่มหมวดหมู่</button></h2>
+      <ul id="categoryList"></ul>
+    </div>
+  </div>
+
+  <!-- Menu Form Modal (for add/edit) -->
+  <div class="modal" id="menuFormModal">
+    <div class="modal-content">
+      <span class="close" id="closeMenuForm">&times;</span>
+      <h3 id="modalTitle">เพิ่มเมนู</h3>
+      <form id="menuForm">
+        <input type="hidden" id="menuId">
+        <label>ชื่อ</label><input type="text" id="menuName" required>
+        <label>ราคา</label><input type="number" id="menuPrice" required>
+        <label>รายละเอียด</label><textarea id="menuDesc"></textarea>
+        <label>หมวดหมู่</label>
+        <select id="menuCategory"></select>
+        <label>สถานะ</label>
+        <select id="menuStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select>
+        <label>รูปภาพ</label>
+        <div class="image-upload">
+          <input type="file" id="imageFile" accept="image/*">
+          <img id="imagePreview" src="" style="max-width:200px; display:none;">
+          <div class="drop-zone" id="dropZone">ลากและวางรูปที่นี่</div>
+          <button type="button" id="uploadImageBtn">อัปโหลดรูป</button>
+          <input type="hidden" id="imageUrl">
+        </div>
+        <button type="submit">บันทึก</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content" style="text-align:center;">
+      <p>คุณต้องการลบรายการนี้ใช่หรือไม่?</p>
+      <button id="confirmDeleteBtn">ยืนยัน</button>
+      <button id="cancelDeleteBtn">ยกเลิก</button>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div class="modal" id="categoryModal">
+    <div class="modal-content">
+      <span class="close" id="closeCategoryModal">&times;</span>
+      <h3>เพิ่ม/แก้ไขหมวดหมู่</h3>
+      <input type="text" id="categoryNameInput" placeholder="ชื่อหมวดหมู่">
+      <input type="hidden" id="categoryId">
+      <button id="saveCategoryBtn">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== CONFIG ====================
+const API_BASE_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL'; // <-- เปลี่ยนตรงนี้
+
+// ==================== GLOBAL STATE ====================
+let menus = [];
+let categories = [];
+let token = localStorage.getItem('adminToken') || null;
+let deleteTarget = null; // ใช้เก็บข้อมูลที่จะลบ
+
+// ==================== UTILS ====================
+async function fetchAPI(action, method = 'GET', body = null, isFileUpload = false) {
+  let url = `${API_BASE_URL}?action=${action}`;
+  if (token) url += `&token=${token}`;
+  
+  const options = { method };
+  if (body && !isFileUpload) {
+    options.body = JSON.stringify(body);
+    options.headers = { 'Content-Type': 'application/json' };
+  } else if (isFileUpload && body) {
+    options.body = body; // FormData
+  }
+  
+  const res = await fetch(url, options);
+  return res.json();
+}
+
+// ==================== PUBLIC SITE ====================
+document.addEventListener('DOMContentLoaded', () => {
+  // ถ้า token มีอยู่แล้วและอยู่ในหน้า admin (หรือไม่) จะไม่โหลด public ทันที
+  // เริ่มต้น public view แสดง
+  loadPublicData();
+  
+  // Event listeners public
+  document.getElementById('goToAdmin').addEventListener('click', (e) => {
+    e.preventDefault();
+    switchToAdmin();
+  });
+  document.getElementById('menuModalClose').addEventListener('click', () => {
+    document.getElementById('menuModal').classList.remove('active');
+  });
+  document.getElementById('menuModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+  });
+});
+
+async function loadPublicData() {
+  renderSkeletons(8);
+  const res = await fetchAPI('getPublicData');
+  if (!res.success) { console.error(res.error); return; }
+  const data = res.data;
+  
+  document.getElementById('siteName').textContent = data.siteName || 'ร้านอาหาร';
+  document.getElementById('heroTagline').textContent = data.heroTagline || '';
+  if (data.heroImageUrl) {
+    document.getElementById('hero').style.backgroundImage = `url(${data.heroImageUrl})`;
+  }
+  
+  menus = data.menus;
+  categories = data.categories;
+  
+  renderCategories();
+  renderMenus(menus);
+  
+  document.getElementById('searchInput').addEventListener('input', filterMenus);
+}
+
+function renderSkeletons(count) {
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = '';
+  for (let i=0; i<count; i++) {
+    const skel = document.createElement('div');
+    skel.className = 'skeleton';
+    grid.appendChild(skel);
+  }
+}
+
+function renderCategories() {
+  const container = document.getElementById('categoryFilter');
+  container.querySelectorAll('.cat-btn:not(:first-child)').forEach(b => b.remove());
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn';
+    btn.textContent = cat;
+    btn.dataset.category = cat;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterMenus();
+    });
+    container.appendChild(btn);
+  });
+  document.querySelector('.cat-btn[data-category="all"]').addEventListener('click', function() {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    filterMenus();
+  });
+}
+
+function filterMenus() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const activeCategory = document.querySelector('.cat-btn.active')?.dataset.category || 'all';
+  let filtered = menus;
+  if (activeCategory !== 'all') filtered = filtered.filter(m => m.category === activeCategory);
+  if (searchTerm) filtered = filtered.filter(m => m.name.toLowerCase().includes(searchTerm));
+  renderMenus(filtered);
+}
+
+function renderMenus(menuList) {
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = '';
+  if (menuList.length === 0) {
+    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;">ไม่พบเมนู</p>';
+    return;
+  }
+  menuList.forEach(menu => {
+    const card = document.createElement('div');
+    card.className = 'menu-card';
+    card.innerHTML = `
+      <img src="${menu.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22300%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22%3ENo Image%3C/text%3E%3C/svg%3E'}" alt="${menu.name}" loading="lazy" onerror="this.src='data:image/svg+xml,...'">
+      <div class="card-body">
+        <h3>${menu.name}</h3>
+        <span class="price">฿${menu.price}</span>
+      </div>
+    `;
+    card.addEventListener('click', () => openMenuModal(menu));
+    grid.appendChild(card);
+  });
+}
+
+function openMenuModal(menu) {
+  document.getElementById('modalImage').src = menu.imageUrl || '';
+  document.getElementById('modalName').textContent = menu.name;
+  document.getElementById('modalPrice').textContent = `฿${menu.price}`;
+  document.getElementById('modalDescription').textContent = menu.description || '';
+  document.getElementById('modalCategory').textContent = menu.category;
+  document.getElementById('menuModal').classList.add('active');
+}
+
+// ==================== ADMIN SWITCHING ====================
+function switchToAdmin() {
+  document.getElementById('publicView').style.display = 'none';
+  document.getElementById('adminView').style.display = 'block';
+  if (token) {
+    showDashboard();
+    loadDashboardData();
+  } else {
+    document.getElementById('loginBox').style.display = 'block';
+    document.getElementById('dashboardBox').style.display = 'none';
+  }
+}
+
+function switchToPublic() {
+  document.getElementById('adminView').style.display = 'none';
+  document.getElementById('publicView').style.display = 'block';
+}
+
+// ==================== ADMIN AUTH ====================
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const pw = document.getElementById('passwordInput').value;
+  const res = await fetchAPI('login', 'POST', { password: pw });
+  if (res.success) {
+    token = res.data.token;
+    localStorage.setItem('adminToken', token);
+    document.getElementById('loginBox').style.display = 'none';
+    showDashboard();
+    loadDashboardData();
+  } else {
+    document.getElementById('loginError').textContent = 'รหัสผ่านไม่ถูกต้อง';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('adminToken');
+  token = null;
+  document.getElementById('dashboardBox').style.display = 'none';
+  document.getElementById('loginBox').style.display = 'block';
+  switchToPublic();
+});
+
+function showDashboard() {
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('dashboardBox').style.display = 'block';
+}
+
+// ==================== DASHBOARD ====================
+async function loadDashboardData() {
+  const res = await fetchAPI('getDashboard');
+  if (!res.success) { logout(); return; }
+  const d = res.data;
+  
+  document.getElementById('kpiCards').innerHTML = `
+    <div class="kpi-card"><h3>${d.totalMenus}</h3><p>เมนูทั้งหมด</p></div>
+    <div class="kpi-card"><h3>${d.totalCategories}</h3><p>หมวดหมู่</p></div>
+    <div class="kpi-card"><h3>${d.totalImages}</h3><p>รูปภาพ</p></div>
+    <div class="kpi-card"><h3>${d.lastUpdate ? new Date(d.lastUpdate).toLocaleDateString('th-TH') : '-'}</h3><p>อัปเดตล่าสุด</p></div>
+  `;
+  
+  const statsDiv = document.getElementById('categoryStats');
+  statsDiv.innerHTML = '';
+  for (const [cat, count] of Object.entries(d.stats)) {
+    statsDiv.innerHTML += `<span style="margin-right:15px;">${cat}: ${count} รายการ</span>`;
+  }
+  
+  const actList = document.getElementById('activityList');
+  actList.innerHTML = d.recentActivities.map(a => 
+    `<li>${new Date(a.timestamp).toLocaleString('th-TH')} - ${a.action} ${a.menuName || a.details}</li>`
+  ).join('');
+  
+  await loadMenus();
+  await loadCategories();
+}
+
+async function loadMenus() {
+  const res = await fetchAPI('getAllMenus');
+  if (res.success) {
+    const tbody = document.querySelector('#menuTable tbody');
+    tbody.innerHTML = res.data.map(m => `
+      <tr>
+        <td><img src="${m.imageUrl || ''}" width="50" onerror="this.style.display='none'"></td>
+        <td>${m.name}</td>
+        <td>${m.price}</td>
+        <td>${m.category}</td>
+        <td>${m.status}</td>
+        <td>
+          <button onclick="editMenu('${m.id}')">แก้ไข</button>
+          <button onclick="confirmDelete('menu','${m.id}')">ลบ</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+}
+
+async function loadCategories() {
+  const res = await fetchAPI('getAllCategories');
+  if (res.success) {
+    const list = document.getElementById('categoryList');
+    list.innerHTML = res.data.map(c => `
+      <li>${c.name} 
+        <button onclick="editCategory('${c.id}','${c.name}')">แก้ไข</button>
+        <button onclick="confirmDelete('category','${c.id}')">ลบ</button>
+      </li>
+    `).join('');
+  }
+}
+
+// ==================== MENU CRUD ====================
+document.getElementById('addMenuBtn').addEventListener('click', () => openMenuForm());
+document.getElementById('closeMenuForm').addEventListener('click', () => {
+  document.getElementById('menuFormModal').classList.remove('active');
+});
+document.getElementById('menuForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('menuId').value;
+  const data = {
+    name: document.getElementById('menuName').value,
+    price: parseFloat(document.getElementById('menuPrice').value),
+    description: document.getElementById('menuDesc').value,
+    category: document.getElementById('menuCategory').value,
+    status: document.getElementById('menuStatus').value,
+    imageUrl: document.getElementById('imageUrl').value
+  };
+  
+  let res;
+  if (id) {
+    data.id = id;
+    res = await fetchAPI('updateMenu', 'POST', data);
+  } else {
+    res = await fetchAPI('addMenu', 'POST', data);
+  }
+  if (res.success) {
+    document.getElementById('menuFormModal').classList.remove('active');
+    loadDashboardData();
+  } else {
+    alert('Error: ' + res.error);
+  }
+});
+
+async function editMenu(id) {
+  const res = await fetchAPI('getAllMenus');
+  const menu = res.data.find(m => m.id === id);
+  if (!menu) return;
+  document.getElementById('menuId').value = menu.id;
+  document.getElementById('menuName').value = menu.name;
+  document.getElementById('menuPrice').value = menu.price;
+  document.getElementById('menuDesc').value = menu.description || '';
+  document.getElementById('menuStatus').value = menu.status;
+  document.getElementById('imageUrl').value = menu.imageUrl || '';
+  document.getElementById('modalTitle').textContent = 'แก้ไขเมนู';
+  
+  // populate category dropdown
+  await populateCategoryDropdown();
+  document.getElementById('menuCategory').value = menu.category;
+  
+  document.getElementById('imagePreview').src = menu.imageUrl || '';
+  document.getElementById('imagePreview').style.display = menu.imageUrl ? 'block' : 'none';
+  
+  document.getElementById('menuFormModal').classList.add('active');
+}
+
+function openMenuForm() {
+  document.getElementById('menuId').value = '';
+  document.getElementById('menuName').value = '';
+  document.getElementById('menuPrice').value = '';
+  document.getElementById('menuDesc').value = '';
+  document.getElementById('menuStatus').value = 'Active';
+  document.getElementById('imageUrl').value = '';
+  document.getElementById('modalTitle').textContent = 'เพิ่มเมนู';
+  document.getElementById('imagePreview').style.display = 'none';
+  populateCategoryDropdown();
+  document.getElementById('menuFormModal').classList.add('active');
+}
+
+async function populateCategoryDropdown() {
+  const res = await fetchAPI('getAllCategories');
+  const select = document.getElementById('menuCategory');
+  select.innerHTML = res.data.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+}
+
+// ==================== DELETE CONFIRMATION ====================
+function confirmDelete(type, id) {
+  deleteTarget = { type, id };
+  document.getElementById('deleteModal').classList.add('active');
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+  if (!deleteTarget) return;
+  const { type, id } = deleteTarget;
+  let res;
+  if (type === 'menu') {
+    res = await fetchAPI('deleteMenu', 'POST', { id });
+  } else if (type === 'category') {
+    res = await fetchAPI('deleteCategory', 'POST', { id });
+  }
+  if (res.success) {
+    document.getElementById('deleteModal').classList.remove('active');
+    loadDashboardData();
+  } else {
+    alert('Error: ' + res.error);
+  }
+  deleteTarget = null;
+});
+
+document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+  document.getElementById('deleteModal').classList.remove('active');
+  deleteTarget = null;
+});
+
+// ==================== IMAGE UPLOAD ====================
+document.getElementById('uploadImageBtn').addEventListener('click', async () => {
+  const fileInput = document.getElementById('imageFile');
+  const file = fileInput.files[0];
+  if (!file) return alert('กรุณาเลือกรูป');
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetchAPI('uploadImage', 'POST', formData, true);
+  if (res.success) {
+    document.getElementById('imageUrl').value = res.data.imageUrl;
+    document.getElementById('imagePreview').src = res.data.imageUrl;
+    document.getElementById('imagePreview').style.display = 'block';
+  } else {
+    alert('อัปโหลดไม่สำเร็จ');
+  }
+});
+
+document.getElementById('imageFile').addEventListener('change', function() {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('imagePreview').src = e.target.result;
+      document.getElementById('imagePreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => e.preventDefault());
+dropZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetchAPI('uploadImage', 'POST', formData, true);
+    if (res.success) {
+      document.getElementById('imageUrl').value = res.data.imageUrl;
+      document.getElementById('imagePreview').src = res.data.imageUrl;
+      document.getElementById('imagePreview').style.display = 'block';
+    }
+  }
+});
+
+// ==================== CATEGORY CRUD ====================
+document.getElementById('addCategoryBtn').addEventListener('click', () => {
+  document.getElementById('categoryId').value = '';
+  document.getElementById('categoryNameInput').value = '';
+  document.getElementById('categoryModal').classList.add('active');
+});
+
+document.getElementById('closeCategoryModal').addEventListener('click', () => {
+  document.getElementById('categoryModal').classList.remove('active');
+});
+
+document.getElementById('saveCategoryBtn').addEventListener('click', async () => {
+  const id = document.getElementById('categoryId').value;
+  const name = document.getElementById('categoryNameInput').value;
+  let res;
+  if (id) {
+    res = await fetchAPI('updateCategory', 'POST', { id, name });
+  } else {
+    res = await fetchAPI('addCategory', 'POST', { name });
+  }
+  if (res.success) {
+    document.getElementById('categoryModal').classList.remove('active');
+    loadDashboardData();
+  } else {
+    alert('Error: ' + res.error);
+  }
+});
+
+function editCategory(id, name) {
+  document.getElementById('categoryId').value = id;
+  document.getElementById('categoryNameInput').value = name;
+  document.getElementById('categoryModal').classList.add('active');
+}
+
+// ==================== INIT ====================
+// ถ้า token มีอยู่และผู้ใช้เปิดหน้า admin โดยตรง (ผ่าน hash) เราอาจสลับไป admin
+if (window.location.hash === '#admin') {
+  switchToAdmin();
+}
+</script>
 </body>
 </html>
